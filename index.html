@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#040908">
+  <meta name="description" content="一场取材于公开网络档案的虚构恐怖解密游戏。内容纯属虚构。">
+  <meta property="og:title" content="南康白起真相探寻｜虚构恐怖解密游戏">
+  <meta property="og:description" content="有人在账号注销一年后再次登录。六份档案，只有一份记得你。">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>南康白起真相探寻｜虚构恐怖解密游戏</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="gate-open">
+  <a class="skip-link" href="#cases">跳到档案</a>
+  <div class="noise" aria-hidden="true"></div>
+
+  <section class="fiction-gate" id="fictionGate" aria-labelledby="gateTitle">
+    <div class="gate-panel">
+      <p class="eyebrow">ARCHIVE SAFETY NOTICE / 进入前必读</p>
+      <div class="gate-stamp" aria-hidden="true">纯属虚构</div>
+      <h1 id="gateTitle">这份档案<br><em>从未存在</em></h1>
+      <p class="gate-lede"><strong>本游戏内容纯属虚构。</strong>作品仅从用户提供的公开资料中提取“旧论坛、失效网页、时间矛盾与账号痕迹”等叙事元素。游戏内人物关系、对白、密码、地点、调查过程、恐怖现象与最终结局均为艺术创作，不是对现实人物经历的陈述或暗示。</p>
+      <div class="gate-meta"><span>心理恐怖</span><span>6 份档案</span><span>约 10 分钟</span></div>
+      <button class="button button-primary" type="button" id="enterGame">我已知悉，读取档案 <span aria-hidden="true">↘</span></button>
+      <p class="content-note">内容提示：含虚构死亡传闻、账号异常、突然音画效果；不展示具体伤害画面。</p>
+    </div>
+  </section>
+
+  <div class="game-shell" id="gameShell" aria-hidden="true">
+    <header class="topbar">
+      <a class="wordmark" href="#top" aria-label="回到档案首页"><span class="wordmark-mark">NK</span><span>已注销用户档案室</span></a>
+      <div class="status-chip" aria-live="polite"><span class="status-dot"></span><span id="headerProgress">访客模式</span></div>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="heroTitle">
+        <div class="hero-copy">
+          <p class="eyebrow">RECOVERED FILE · 2004—2015</p>
+          <h1 id="heroTitle">南康白起<br><em>真相探寻</em></h1>
+          <p class="hero-lede">2015 年，你受托修复一批来自旧论坛的损坏页面。第一个页面写着：“南康已经离开。”第二个页面写着：“该用户昨夜登录。”服务器记录显示，打开第二个页面的人——是你。</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#cases">开始恢复 <span aria-hidden="true">↘</span></a>
+            <button class="button button-ghost" type="button" data-open-sources>查看取材说明</button>
+          </div>
+          <p class="content-note"><span aria-hidden="true">◌</span> 建议佩戴耳机。页面不会请求麦克风、摄像头或任何账号权限。</p>
+        </div>
+        <div class="evidence-board haunted-board" aria-label="异常档案概览">
+          <div class="board-label">CORRUPTED EVIDENCE BOARD / 损坏率 35%</div>
+          <div class="board-orbit orbit-one"></div><div class="board-orbit orbit-two"></div>
+          <article class="paper paper-main">
+            <span class="paper-kicker">系统恢复文本</span>
+            <strong>不要相信<br>第十五天。</strong>
+            <span class="redaction"></span><span class="redaction short"></span>
+          </article>
+          <article class="paper paper-a"><span>2004</span><strong>作者专栏</strong></article>
+          <article class="paper paper-b"><span>2008</span><strong>死亡帖</strong></article>
+          <article class="paper paper-c"><span>2009</span><strong>再次登录</strong></article>
+          <div class="stamp">已 注 销</div>
+          <div class="cursor-ghost" aria-hidden="true">访客_00035 正在浏览…</div>
+        </div>
+      </section>
+
+      <section class="rules" aria-label="恢复守则">
+        <div class="section-heading compact"><div><p class="eyebrow">RECOVERY PROTOCOL</p><h2>档案恢复守则</h2></div></div>
+        <div class="grade-grid">
+          <article><span class="grade grade-a">01</span><div><strong>对照时间</strong><p>页面会说谎，时间戳通常晚一步。</p></div></article>
+          <article><span class="grade grade-b">02</span><div><strong>追查源头</strong><p>“摘自某网友”可能没有那个网友。</p></div></article>
+          <article><span class="grade grade-c">03</span><div><strong>留意账号</strong><p>同一个密码，能叫醒很多名字。</p></div></article>
+          <article><span class="grade grade-d">04</span><div><strong>保持怀疑</strong><p>越完整的故事，越可能藏着删改。</p></div></article>
+        </div>
+      </section>
+
+      <section class="case-section" id="cases" aria-labelledby="casesTitle">
+        <div class="section-heading">
+          <p class="eyebrow">SIX CORRUPTED FILES</p>
+          <h2 id="casesTitle">六份损坏档案</h2>
+          <p>每恢复一份，系统就会多记住你一点。选错不会扣分，但有些错误答案会留下痕迹。</p>
+        </div>
+        <div class="progress-wrap" aria-label="恢复进度">
+          <div class="progress-meta"><span>恢复完成度</span><strong id="progressText">0 / 6</strong></div>
+          <div class="progress-track"><span id="progressBar"></span></div>
+        </div>
+        <div class="case-list" id="caseList"></div>
+      </section>
+
+      <section class="verdict horror-ending" id="verdict" aria-labelledby="verdictTitle" hidden>
+        <div class="verdict-seal" aria-hidden="true">不要回头</div>
+        <div class="verdict-copy">
+          <p class="eyebrow">ENDING 01 · THE ACCOUNT THAT REMEMBERS</p>
+          <h2 id="verdictTitle">你恢复的不是一个人的结局，<br>而是一个会复制自己的故事。</h2>
+          <p>在这个纯属虚构的结局里，2008 年的死亡帖不是记录，而是一段程序。它从旧专栏里抽取姓名，从悼念帖里学习语气，再让一批共用密码的账号互相引用。每一次转发，都让故事长出一个更具体、也更错误的细节。</p>
+          <p>“十五天”来自最早的悼文；日期实际相隔十八天。“旺仔”只存在于“摘自某网友”的一行文字里。地方新闻库没有那条打捞记录，因为程序从来不需要现实发生过什么——它只需要有人继续查。</p>
+          <div class="verdict-grid">
+            <article class="confidence high"><span>异常 01</span><strong>15 ≠ 18</strong><small>数字被故事保留，日期被遗忘</small></article>
+            <article class="confidence medium"><span>异常 02</span><strong>共用密码</strong><small>多个纪念账号来自同一把钥匙</small></article>
+            <article class="confidence low"><span>异常 03</span><strong>死后登录</strong><small>2009 年，注销账号再次出现</small></article>
+          </div>
+          <div class="terminal-line" id="terminalLine">正在把访客加入纪念账号列表…</div>
+          <div class="verdict-actions">
+            <button class="button button-primary" type="button" data-open-sources>查看现实取材边界</button>
+            <button class="text-button" type="button" id="restartButton">清除本地进度并重来</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="method" aria-labelledby="methodTitle">
+        <div><p class="eyebrow">CREATOR'S NOTE</p><h2 id="methodTitle">现实取材，虚构结局</h2></div>
+        <div class="method-copy">
+          <p>游戏谜题取材于所提供资料中能够复核的“文档结构”：2004 年创作页面、2008 年同期帖子、15/18 天矛盾、2009 年账号登录传闻、多个关联账号共用密码、2015 年截图调查、地方新闻检索零命中。</p>
+          <p>游戏中的“自动复制故事程序”、系统对白、访客账号、因果关系和结局完全虚构。它们只用于制造恐怖体验，不能用于判断现实人物或事件。</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>南康白起真相探寻 · 虚构恐怖解密游戏</p>
+      <p>现实取材 / 虚构叙事 · <button type="button" data-open-sources>边界说明</button></p>
+    </footer>
+  </div>
+
+  <dialog class="sources-dialog" id="sourcesDialog" aria-labelledby="sourcesTitle">
+    <div class="dialog-head">
+      <div><p class="eyebrow">SOURCE BOUNDARY</p><h2 id="sourcesTitle">取材与虚构边界</h2></div>
+      <button class="close-button" type="button" aria-label="关闭说明" id="closeSources">×</button>
+    </div>
+    <p class="dialog-intro">本页刻意不链接或复述涉及现实身份、人肉与未经证实死因的内容。以下只说明叙事元素如何从资料结构转化为虚构谜题。</p>
+    <div class="source-list" id="sourceList"></div>
+    <div class="dialog-foot">
+      <p><strong>再次声明：</strong>所有恐怖现象、幕后程序、账号动机、人物对白与最终真相均为虚构。</p>
+      <button class="button button-ghost" type="button" id="closeSourcesBottom">返回游戏</button>
+    </div>
+  </dialog>
+
+  <noscript><div class="noscript">需要启用 JavaScript 才能进行档案恢复。</div></noscript>
+  <script src="app.js" defer></script>
+</body>
+</html>
