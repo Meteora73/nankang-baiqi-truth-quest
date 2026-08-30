@@ -7,14 +7,14 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta name="theme-color" content="#e8f0f8">
-  <meta name="description" content="南康白起真相探寻：一款古早论坛风格的虚构悬疑解密游戏。">
-  <meta property="og:title" content="南康白起真相探寻｜旧网页解密">
-  <meta property="og:description" content="七个旧网页，一条不断被登录改写的时间线。剧情为虚构。">
+  <meta name="description" content="一份停在 2008 年的旧论坛镜像。剧情为虚构。">
+  <meta property="og:title" content="天涯社区旧版镜像">
+  <meta property="og:description" content="全球华人网上家园。剧情为虚构。">
   <meta property="og:type" content="website">
   <meta property="og:image" content="og.png?v=20260830-3">
-  <title>南康白起真相探寻 - 旧页恢复中心</title>
+  <title>天涯社区旧版镜像 - 全球华人网上家园</title>
   <link rel="icon" href="favicon.svg?v=20260830-3" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=20260830-4">
+  <link rel="stylesheet" href="styles.css?v=20260830-5">
 </head>
 <body>
   <div class="fiction-line">※ 剧情为虚构。</div>
@@ -23,45 +23,58 @@
     <header class="masthead">
       <div class="utility"><span>设为首页</span> | <span>加入收藏</span> | <span>联系我们</span></div>
       <div class="brand-row">
-        <a class="brand" href="#page-0" aria-label="返回首页">旧页<span>恢复中心</span></a>
-        <div class="banner">南康白起真相探寻<br><small>INTERNET ARCHIVE MYSTERY</small></div>
+        <a class="brand" href="#page-0" data-goto="0" aria-label="返回社区首页"><span>天涯</span>社区<small>tianya.cn</small></a>
+        <div class="brand-slogan">全球华人网上家园<br><small>旧版页面镜像 · 数据恢复于 2015-05-27</small></div>
+        <div class="header-ad"><b>天涯聚焦</b><br>十年网友故事征集<br><span>点击进入专题 &gt;&gt;</span></div>
       </div>
       <nav aria-label="网站导航">
-        <span>首页</span><span>论坛旧帖</span><span>文学专栏</span><span>网友日记</span><span>站内搜索</span><span>用户中心</span>
+        <button type="button" data-goto="0">社区首页</button><button type="button" data-dead-title="天涯聚焦">天涯聚焦</button><button type="button" data-dead-title="天涯博客">天涯博客</button><button type="button" data-dead-title="相册">相册</button><button type="button" data-dead-title="来吧">来吧</button><button type="button" data-recovery>用户中心</button>
       </nav>
-      <div class="ticker"><b>站内公告：</b><span id="tickerText">2008 年旧帖镜像恢复完成，请勿重复登录已注销账号。</span></div>
+      <div class="ticker"><b>站内公告：</b><span id="tickerText">旧版社区仅供浏览，部分帖子及用户资料可能无法访问。</span></div>
     </header>
+
+    <div class="archive-dock" id="archiveDock" hidden>
+      <b>已打开的页面：</b>
+      <button type="button" data-goto="1">悼念帖</button><button type="button" data-goto="2">新闻目录</button><button type="button" data-goto="3">豆瓣转述</button><button type="button" data-goto="4">账号记录</button><button type="button" data-goto="5">澄清帖</button><button type="button" data-goto="6">网络日记</button><button type="button" data-goto="7">闲情调查</button><button class="recover-link" type="button" data-goto="8">账号恢复</button>
+    </div>
 
     <main id="game" aria-live="polite">
       <section class="screen active" id="page-0" data-page="0" aria-labelledby="title-0">
-        <div class="crumb">当前位置：首页 &gt; 专题 &gt; 南康白起真相探寻</div>
-        <div class="portal-grid">
-          <div class="portal-main old-panel">
-            <div class="panel-title">■ 本站特别专题</div>
-            <div class="special">
-              <div class="pixel-folder" aria-hidden="true">档案</div>
-              <div>
-                <h1 id="title-0">南康白起真相探寻</h1>
-                <p class="lead">2015 年 5 月 27 日，一个已经失效的论坛镜像突然重新上线。站内只剩七个页面，每一页都要求访问者回答一个问题。</p>
-                <p>你受托恢复这些页面。服务器提醒：<strong>不要登录，不要输入密码，不要相信页面自动补全的文字。</strong></p>
+        <div class="crumb">当前位置：天涯社区 &gt; 社区首页</div>
+        <div class="forum-portal">
+          <div class="portal-left">
+            <section class="old-panel welcome-box">
+              <div class="panel-title" id="title-0">天涯社区</div>
+              <div class="welcome-row">
+                <div><b>欢迎访问天涯社区旧版镜像</b><br><span>目前共有 18,620,413 位注册用户　在线：12,731 人</span></div>
+                <form class="quick-login" onsubmit="return false"><label>用户名 <input aria-label="用户名" disabled></label><label>密码 <input aria-label="密码" type="password" disabled></label><button disabled>登录</button></form>
               </div>
-            </div>
-            <div class="download-box">
-              <p><b>专题编号：</b>NK-2004-35　　<b>页面数量：</b>7</p>
-              <p><b>最后更新：</b><span id="todayText"></span>　　<b>当前在线：</b><span class="red">1 人</span></p>
-            </div>
-            <button class="old-button start-button" type="button" data-next>进入旧帖 &gt;&gt;</button>
+            </section>
+
+            <section class="old-panel board-directory">
+              <div class="panel-title">社区版块 <span>版主申请｜版务处理｜更多版块</span></div>
+              <div class="board-row"><div class="board-icon">闲</div><div><button data-dead-title="天涯杂谈">天涯杂谈</button><p>民间语文，思想盛宴</p></div><div><button data-dead-title="娱乐八卦">娱乐八卦</button><p>娱乐是一种精神</p></div><div><button data-dead-title="情感天地">情感天地</button><p>说出你的故事</p></div></div>
+              <div class="board-row"><div class="board-icon">文</div><div><button data-dead-title="舞文弄墨">舞文弄墨</button><p>原创文学交流园地</p></div><div><button data-dead-title="煮酒论史">煮酒论史</button><p>青梅煮酒，纵论古今</p></div><div><button data-dead-title="一路同行">一路同行</button><p>分享生活与远行</p></div></div>
+              <div class="board-row"><div class="board-icon">奇</div><div><button data-dead-title="莲蓬鬼话">莲蓬鬼话</button><p>奇闻、悬疑与民间故事</p></div><div><button data-dead-title="未知学院">未知学院</button><p>探索那些无法解释的事</p></div><div><button data-dead-title="电脑网络">电脑网络</button><p>互联网与数码生活</p></div></div>
+            </section>
+
+            <section class="old-panel topic-list">
+              <div class="panel-title">今日热帖 <span>主题 / 作者 / 回复 / 最后回复</span></div>
+              <div class="topic-row"><span>[天涯杂谈]</span><button data-dead-title="十年前的网吧，现在还有人记得吗">十年前的网吧，现在还有人记得吗</button><small>南城旧事　84　12:37</small></div>
+              <div class="topic-row"><span>[娱乐八卦]</span><button data-dead-title="大家记忆里最好听的一首老歌">大家记忆里最好听的一首老歌</button><small>绿袖子　219　12:31</small></div>
+              <div class="topic-row story-topic"><span>[一路同行]</span><button type="button" data-story-trigger>《[左岸文字] 长沙的南康，一路走好》</button><small>我帅故我在吗　437　03-27</small></div>
+              <div class="topic-row"><span>[莲蓬鬼话]</span><button data-dead-title="有没有遇到过已经注销却还在上线的账号">有没有遇到过已经注销却还在上线的账号？</button><small>guest　35　00:35</small></div>
+              <div class="topic-row"><span>[情感天地]</span><button data-dead-title="我等一个不会回来的人，第三年">我等一个不会回来的人，第三年</button><small>北方来信　56　昨天</small></div>
+              <div class="topic-row"><span>[电脑网络]</span><button data-dead-title="求助：年轮日记网站打不开了">求助：年轮日记网站打不开了</button><small>盐汽水　12　2009-05</small></div>
+              <div class="topic-row"><span>[舞文弄墨]</span><button data-dead-title="长篇连载：春天花会开（每日更新）">长篇连载：春天花会开（每日更新）</button><small>纸上行舟　128　11:06</small></div>
+            </section>
           </div>
-          <aside class="sidebar old-panel">
-            <div class="panel-title">◆ 热门文章排行</div>
-            <ol>
-              <li><a>《浮生六记》旧页</a></li>
-              <li><a>我等你到三十五岁</a></li>
-              <li><a>南康的网络日记本</a></li>
-              <li><a>该用户已注销</a></li>
-              <li><a class="blink">谁在 2009 年登录？</a></li>
-            </ol>
-            <div class="counter">您是第 <b id="visitCount">000035</b> 位访客</div>
+
+          <aside class="portal-right">
+            <section class="old-panel side-login"><div class="panel-title">用户中心</div><p>您尚未登录</p><button type="button" data-recovery>找回账号 / 密码</button><p class="muted">注册新用户　｜　帮助中心</p></section>
+            <section class="old-panel compact-list"><div class="panel-title">社区公告</div><button data-dead-title="旧版社区镜像使用说明">旧版社区镜像使用说明</button><button data-dead-title="关于部分历史数据缺失的公告">关于部分历史数据缺失的公告</button><button data-dead-title="用户昵称清理通知">用户昵称清理通知</button></section>
+            <section class="old-panel compact-list"><div class="panel-title">热门推荐</div><button data-dead-title="2008，那些留在论坛里的人">2008，那些留在论坛里的人</button><button data-dead-title="旧贴寻人：你还记得他吗">旧贴寻人：你还记得他吗</button><button data-dead-title="十大最感人的网络文字">十大最感人的网络文字</button></section>
+            <div class="counter">您是第 <b id="visitCount">000035</b> 位访客<br><small>今日：3512　昨日：10427</small></div>
           </aside>
         </div>
       </section>
@@ -92,14 +105,6 @@
           <div class="floor"><span>7#　马甲冲冲　2008-03-27</span><p>无语，南康是谁啊，长沙N年都没听说过。。。</p></div>
           <div class="floor"><span>11#　眉聚江山之秀　2008-03-27</span><p>我是天涯的后来者,还不知道南康是谁</p></div>
         </div>
-        <div class="quiz-box">
-          <div class="quiz-title">问题 1 / 7</div>
-          <h2>楼主在原帖中怎样说明自己与南康的关系？</h2>
-          <div class="answers vertical">
-            <button data-answer>现实中的同学和好友</button><button data-answer="correct">只听过名字、了解一点的网友</button><button data-answer>负责打捞报道的记者</button>
-          </div>
-          <p class="feedback"></p>
-        </div>
       </section>
 
       <section class="screen" id="page-2" data-page="2" aria-labelledby="title-2">
@@ -127,16 +132,6 @@
           </div>
           <p class="small-note">目录零命中只能否定“已经找到这篇公开报道”，不能单独证明事件绝对没有发生。</p>
         </div>
-        <div class="quiz-box">
-          <div class="quiz-title">问题 2 / 7</div>
-          <h2>这 344 条零命中最能说明什么？</h2>
-          <div class="answers vertical">
-            <button data-answer>证明那件事绝对没有发生</button>
-            <button data-answer="correct">传闻所称的公开新闻记录没有找到</button>
-            <button data-answer>证明 344 篇新闻都被删除了</button>
-          </div>
-          <p class="feedback"></p>
-        </div>
       </section>
 
       <section class="screen" id="page-3" data-page="3" aria-labelledby="title-3">
@@ -158,16 +153,6 @@
             原帖链接：<b class="red">NULL</b>　聊天记录：<b class="red">NULL</b>
           </div>
           <div class="reply"><b>页面备注</b><p>同一帖子中还出现两个生日版本和两个出生地版本。完整叙述存在，但它仍是匿名网友对“旺仔”的二次转述。</p></div>
-        </div>
-        <div class="quiz-box">
-          <div class="quiz-title">问题 3 / 7</div>
-          <h2>要把“旺仔”当作直接证人，最缺少哪组信息？</h2>
-          <div class="answers vertical">
-            <button data-answer>更多悼念文章和转发量</button>
-            <button data-answer="correct">原账号、原帖日期、楼层与链接</button>
-            <button data-answer>作者作品的出版信息</button>
-          </div>
-          <p class="feedback"></p>
         </div>
       </section>
 
@@ -194,16 +179,6 @@
           <article class="tieba-floor"><aside><b>7楼</b><span>末路狂嚣</span><small>2014-02-19 13:42</small></aside><div><p>“年轮的站长为什么要说是”前几年去世“呢，08年去世到09年也才一年时间啊？”</p></div></article>
           <article class="tieba-floor"><aside><b>10楼</b><span>雾之霾</span><small>2015-06-11 11:11</small></aside><div><p>“个人感觉，有可能是南康的男朋友注销的。浮生六记里面有说他知道南康的登录密码。”</p></div></article>
           <div class="thread-tail">本页恢复 12 条可见内容　最后恢复：2025-08-06</div>
-        </div>
-        <div class="quiz-box">
-          <div class="quiz-title">问题 4 / 7</div>
-          <h2>原帖列出的三次账号操作顺序是什么？</h2>
-          <div class="answers vertical">
-            <button data-answer>注销 → 登录 → 重置</button>
-            <button data-answer="correct">天涯上线 → 年轮重置 → 天涯注销</button>
-            <button data-answer>年轮重置 → 天涯注销 → 天涯上线</button>
-          </div>
-          <p class="feedback"></p>
         </div>
       </section>
 
@@ -235,16 +210,6 @@
             <p><span>p/3811168113　13楼　绾纱离怀：</span>“我等你等到三十五岁 但是我永远到不了三十五岁 所以我会永远等你”</p>
             <p><span>p/3792996580　146楼　JINGKevin77：</span>“南康确实是存在的……其次南康确实去世了 但不是溺水 具体怎么去世的没有人知道”</p>
           </div>
-        </div>
-        <div class="quiz-box">
-          <div class="quiz-title">问题 5 / 7</div>
-          <h2>澄清帖指出，下面哪句话是网友留言，并非南康原话？</h2>
-          <div class="answers vertical">
-            <button data-answer>没有我，这世界多么寂寞</button>
-            <button data-answer="correct">我到不了35岁，所以我会永远等你</button>
-            <button data-answer>清晨六点灰溜溜地出来上网</button>
-          </div>
-          <p class="feedback"></p>
         </div>
       </section>
 
@@ -294,14 +259,6 @@
           </div>
           <div class="recover-note"><b>《杂谈》残句：</b>“在这个日记网站上……我只写过一篇《那个人》，想看吗？^-^，我加密了。”<br>2009：密码被重置 → 私密日志被解锁　／　2013：网友发现它再次出现在列表中</div>
         </div>
-        <div class="quiz-box">
-          <div class="quiz-title">问题 6 / 7</div>
-          <h2>被加密的那篇日记叫什么？</h2>
-          <div class="answers">
-            <button data-answer>清晨六点</button><button data-answer="correct">那个人</button><button data-answer>真的还是假的？</button>
-          </div>
-          <p class="feedback"></p>
-        </div>
       </section>
 
       <section class="screen" id="page-7" data-page="7" aria-labelledby="title-7">
@@ -319,24 +276,97 @@
           <div class="xq-post"><b>№1894　☆☆☆复核于 2015-05-28 留言☆☆☆</b><p>“南康好友”与“永远的南康”均可登录；原账号仍显示注销。新的登录记录开始被后来的转载当成旧证据。</p></div>
           <div class="xq-post ghost-reply"><b>№1900　☆☆☆南康好友于 <span id="nowStamp"></span> 留言☆☆☆</b><p>你们每登录一次，就会多一条“死后上线”的证据。</p></div>
         </div>
-        <div class="quiz-box final-quiz">
-          <div class="quiz-title">问题 7 / 7</div>
-          <h2>在这个虚构故事里，究竟是谁让账号在“死后”不断上线？</h2>
-          <div class="answers vertical">
-            <button data-answer>账号原主人</button>
-            <button data-answer="correct">每一个拿泄露凭据验证传闻的后来者</button>
-            <button data-answer>地方新闻网站管理员</button>
-          </div>
-          <p class="feedback"></p>
-        </div>
       </section>
 
       <section class="screen" id="page-8" data-page="8" aria-labelledby="title-8">
+        <div class="crumb">天涯社区 &gt; 用户中心 &gt; 找回账号 &gt; 密保验证</div>
+        <div class="recovery-shell">
+          <aside class="recovery-sidebar">
+            <div class="recovery-side-title">用户中心</div>
+            <button type="button" data-goto="0">返回社区首页</button>
+            <button type="button" class="selected">找回账号 / 密码</button>
+            <button type="button" data-dead-title="账号申诉记录">账号申诉记录</button>
+            <button type="button" data-dead-title="安全中心">安全中心</button>
+          </aside>
+          <div class="recovery-main">
+            <div class="recovery-title"><b id="title-8">通过密保问题恢复账号</b><span>步骤 <strong id="recoveryStepNumber">1</strong> / 7</span></div>
+            <div class="account-target"><span>正在恢复：</span><b>南康好友</b><small>该账号最后登录记录异常，请回答全部密保问题。</small></div>
+            <div class="recovery-progress" aria-label="账号恢复进度"><i id="recoveryProgressBar"></i></div>
+
+            <form class="recovery-question active" data-recovery-form data-key="relation" data-answer="reader">
+              <div class="question-no">密保问题 1</div>
+              <h2>悼念帖楼主如何说明自己与南康的关系？</h2>
+              <label><input type="radio" name="relation" value="reader"> 只听过名字、了解一点的网友</label>
+              <label><input type="radio" name="relation" value="classmate"> 现实中的同学和好友</label>
+              <label><input type="radio" name="relation" value="reporter"> 负责报道的记者</label>
+              <button class="old-button verify-button" type="submit">提交答案</button>
+              <p class="recovery-feedback" aria-live="polite"></p>
+            </form>
+
+            <form class="recovery-question" data-recovery-form data-key="days" data-answer="18">
+              <div class="question-no">密保问题 2</div>
+              <h2>转述里说 3 月 9 日失去联系，悼念帖发布于 3 月 27 日。两日相隔多少天？</h2>
+              <label class="input-answer">请输入数字：<input name="days" inputmode="numeric" autocomplete="off" maxlength="3"></label>
+              <button class="old-button verify-button" type="submit">提交答案</button>
+              <p class="recovery-feedback" aria-live="polite"></p>
+            </form>
+
+            <form class="recovery-question" data-recovery-form data-key="source" data-answer="missing-source">
+              <div class="question-no">密保问题 3</div>
+              <h2>“旺仔”转述作为直接证词，最关键的是缺少什么？</h2>
+              <label><input type="radio" name="source" value="photo"> 一张当事人的照片</label>
+              <label><input type="radio" name="source" value="school"> 学校名称和班级名单</label>
+              <label><input type="radio" name="source" value="missing-source"> 原账号、原帖日期、楼层与链接</label>
+              <button class="old-button verify-button" type="submit">提交答案</button>
+              <p class="recovery-feedback" aria-live="polite"></p>
+            </form>
+
+            <form class="recovery-question" data-recovery-form data-key="dates" data-answer="050705190615">
+              <div class="question-no">密保问题 4</div>
+              <h2>账号记录中，上线、重置、注销三项的月日依次是什么？</h2>
+              <p class="format-hint">按“月日月日月日”连接输入，共 12 位数字。</p>
+              <label class="input-answer">请输入日期串：<input name="dates" inputmode="numeric" autocomplete="off" maxlength="12"></label>
+              <button class="old-button verify-button" type="submit">提交答案</button>
+              <p class="recovery-feedback" aria-live="polite"></p>
+            </form>
+
+            <form class="recovery-question" data-recovery-form data-key="diary" data-answer="那个人">
+              <div class="question-no">密保问题 5</div>
+              <h2>日记目录中，被加密的那篇日记叫什么？</h2>
+              <label class="input-answer">请输入标题：<input name="diary" autocomplete="off" maxlength="20"></label>
+              <button class="old-button verify-button" type="submit">提交答案</button>
+              <p class="recovery-feedback" aria-live="polite"></p>
+            </form>
+
+            <form class="recovery-question" data-recovery-form data-key="floor" data-answer="1894">
+              <div class="question-no">密保问题 6</div>
+              <h2>闲情调查中，最后一条可以复核的登录记录在第几楼？</h2>
+              <label class="input-answer">请输入楼层号：<input name="floor" inputmode="numeric" autocomplete="off" maxlength="4"></label>
+              <button class="old-button verify-button" type="submit">提交答案</button>
+              <p class="recovery-feedback" aria-live="polite"></p>
+            </form>
+
+            <form class="recovery-question" data-recovery-form data-key="ghost" data-answer="later-users">
+              <div class="question-no">密保问题 7</div>
+              <h2>是谁不断制造了账号“死后上线”的记录？</h2>
+              <label><input type="radio" name="ghost" value="owner"> 原账号主人</label>
+              <label><input type="radio" name="ghost" value="admin"> 新闻网站管理员</label>
+              <label><input type="radio" name="ghost" value="later-users"> 后来拿泄露凭据验证传闻的人</label>
+              <button class="old-button verify-button" type="submit">完成验证</button>
+              <p class="recovery-feedback" aria-live="polite"></p>
+            </form>
+
+            <div class="recovery-actions"><button type="button" data-goto="1">返回档案查找答案</button><span>已完成的密保进度会自动保存</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="page-9" data-page="9" aria-labelledby="title-9">
         <div class="crumb">系统消息 &gt; 恢复完成</div>
         <div class="ending-page">
           <div class="error-title">该用户已注销</div>
           <div class="error-code">ERROR 035</div>
-          <h1 id="title-8">你找到了“死后登录”的人。</h1>
+          <h1 id="title-9">你找到了“死后登录”的人。</h1>
           <p>不是一个人。</p>
           <p>2009 年，有人尝试登录；2011 年，密码库泄露；2015 年，调查者用相同凭据验证账号；每一次成功，都会留下新的上线时间。后来的人看见记录，又把它当作更早传说的证据。</p>
           <p>在这个虚构故事里，所谓幽灵不是死者，而是<strong>一群不肯让账号安静下来的人</strong>。</p>
@@ -346,7 +376,7 @@
             操作：读取全部页面<br>
             状态：<b>已写入下一份镜像</b>
           </div>
-          <button class="old-button" type="button" id="restartButton">返回专题首页</button>
+          <button class="old-button" type="button" id="restartButton">返回社区首页</button>
         </div>
       </section>
     </main>
@@ -357,7 +387,7 @@
     </div>
     <footer>
       <p>关于本站 | 广告服务 | 版权声明 | 网站地图 | 友情连接</p>
-      <p>Copyright © 2004-2015 旧页恢复中心　Powered by static HTML</p>
+      <p>Copyright © 1999-2015 天涯社区旧版镜像　Powered by static HTML</p>
     </footer>
   </div>
 
@@ -379,7 +409,15 @@
     </div>
   </div>
 
-  <script src="diary-data.js?v=20260830-4"></script>
-  <script src="app.js?v=20260830-4"></script>
+  <div class="dead-dialog" id="deadDialog" hidden role="dialog" aria-modal="true" aria-labelledby="deadDialogTitle">
+    <div class="dead-window">
+      <div class="dead-titlebar"><span>Microsoft Internet Explorer</span><button type="button" id="closeDeadTop" aria-label="关闭">×</button></div>
+      <div class="dead-content"><div class="warning-icon">!</div><div><b id="deadDialogTitle">该内容不存在</b><p id="deadDialogText">您访问的页面未被镜像保存，或已被原作者删除。</p><small>HTTP 404 - 文件未找到</small></div></div>
+      <div class="dead-actions"><button class="old-button" type="button" id="closeDeadBottom">确定</button></div>
+    </div>
+  </div>
+
+  <script src="diary-data.js?v=20260830-5"></script>
+  <script src="app.js?v=20260830-5"></script>
 </body>
 </html>

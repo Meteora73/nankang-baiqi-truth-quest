@@ -1,27 +1,55 @@
 const screens = [...document.querySelectorAll(".screen")];
-history.scrollRestoration = "manual";
 const pageCounter = document.querySelector("#pageCounter");
 const tickerText = document.querySelector("#tickerText");
+const archiveDock = document.querySelector("#archiveDock");
 const diaryReader = document.querySelector("#diaryReader");
 const diaryReaderTitle = document.querySelector("#diaryReaderTitle");
 const diaryReaderCrumb = document.querySelector("#diaryReaderCrumb");
 const diaryReaderMeta = document.querySelector("#diaryReaderMeta");
 const diaryReaderText = document.querySelector("#diaryReaderText");
+const deadDialog = document.querySelector("#deadDialog");
+const deadDialogTitle = document.querySelector("#deadDialogTitle");
+const deadDialogText = document.querySelector("#deadDialogText");
+const recoveryStepNumber = document.querySelector("#recoveryStepNumber");
+const recoveryProgressBar = document.querySelector("#recoveryProgressBar");
+const recoveryForms = [...document.querySelectorAll("[data-recovery-form]")];
 const diaryArchive = window.DIARY_ARCHIVE || {};
-const tickers = [
-  "2008 年旧帖镜像恢复完成，请勿重复登录已注销账号。",
-  "天涯旧帖首页恢复 205 条回复，楼主自述只听过南康的名字。",
-  "2015 年调查者检索 344 条地方新闻目录，相关关键词命中为零。",
-  "2009 年豆瓣帖恢复完成：‘旺仔’内容来自未署名的二次转述。",
-  "贴吧 p/2290449729：登录、重置与注销可能并非同一人所为。",
-  "贴吧 p/2409083427：五条网络传言的原始澄清正在载入。",
-  "年轮公开日记目录恢复 20 条，加密日记标题仍可辨认。",
-  "2015 年闲情旧帖恢复完成：泄露口令字段已永久遮挡。",
-  "恢复完成。请关闭页面，不要继续刷新。"
-];
-let currentPage = 0;
-let locked = false;
+const storageKey = "tianya-mirror-recovery-v2";
+
+const tickers = {
+  0: "旧版社区仅供浏览，部分帖子及用户资料可能无法访问。",
+  1: "旧帖首页恢复 205 条回复，全帖回复数记录为 437。",
+  2: "地方新闻目录共恢复 344 条，站内关键词搜索服务已经停止。",
+  3: "小组页面来自 2009 年缓存，原回复账号、日期和楼层缺失。",
+  4: "用户中心正在维护，注销账号的登录记录可能存在延迟。",
+  5: "本页所附外部证明链接大部分已经失效。",
+  6: "网络日记目录已恢复，部分正文没有保存在镜像中。",
+  7: "匿名讨论区只保留部分楼层，请谨慎辨别转载内容。",
+  8: "用户中心：密保验证中。您可以返回已打开的页面查找答案。",
+  9: "账号恢复完成。新的登录记录已经写入。"
+};
+
+let state = loadState();
 let diaryReturnFocus = null;
+let deadReturnFocus = null;
+
+history.scrollRestoration = "manual";
+
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(storageKey));
+    return {
+      storyStarted: Boolean(saved?.storyStarted),
+      recoveryStep: Math.max(0, Math.min(7, Number(saved?.recoveryStep) || 0))
+    };
+  } catch {
+    return { storyStarted: false, recoveryStep: 0 };
+  }
+}
+
+function saveState() {
+  localStorage.setItem(storageKey, JSON.stringify(state));
+}
 
 function pad(value) {
   return String(value).padStart(2, "0");
@@ -39,10 +67,10 @@ function openDiary(title, trigger) {
   diaryReaderText.classList.toggle("missing", !content);
 
   if (content) {
-    diaryReaderMeta.textContent = "正文来源：天涯《南康的网络日记本》存档　｜　支线阅读不影响答题";
+    diaryReaderMeta.textContent = "正文来源：天涯《南康的网络日记本》存档";
     diaryReaderText.textContent = content;
   } else {
-    diaryReaderMeta.textContent = "年轮目录标题已恢复　｜　单篇正文没有留下可读取的存档";
+    diaryReaderMeta.textContent = "年轮目录标题已恢复，单篇正文没有留下可读取的存档";
     diaryReaderText.textContent = "该内容不存在\n\n目录记录仍在，但正文未被保存。";
   }
 
@@ -59,47 +87,120 @@ function closeDiary() {
   diaryReturnFocus = null;
 }
 
-function showPage(index, addHistory = true) {
-  const next = Math.max(0, Math.min(index, screens.length - 1));
-  screens.forEach((screen, i) => {
-    screen.classList.toggle("active", i === next);
-    screen.setAttribute("aria-hidden", i === next ? "false" : "true");
-  });
-  currentPage = next;
-  locked = false;
-  pageCounter.textContent = next === 0 ? "专题首页" : next === 8 ? "恢复完成" : `第 ${next} 页 / 共 7 页`;
-  tickerText.textContent = tickers[next];
-  document.title = next === 0
-    ? "南康白起真相探寻 - 旧页恢复中心"
-    : next === 8
-      ? "该用户已注销 - ERROR 035"
-      : `第 ${next} 页 - 南康白起真相探寻`;
-  if (addHistory) history.pushState({ page: next }, "", `#page-${next}`);
-  window.scrollTo({ top: 0, behavior: "auto" });
-  screens[next].querySelector("h1, h2, button")?.focus({ preventScroll: true });
-  if (next === 8) {
-    document.querySelector("#endingTime").textContent = stamp();
-  }
+function openDead(title, trigger, message = "您访问的页面未被镜像保存，或已被原作者删除。") {
+  deadReturnFocus = trigger;
+  deadDialogTitle.textContent = title ? `“${title}”无法显示` : "该内容不存在";
+  deadDialogText.textContent = message;
+  deadDialog.hidden = false;
+  document.body.classList.add("reader-open");
+  document.querySelector("#closeDeadBottom").focus();
 }
 
-function handleAnswer(button) {
-  if (locked || button.disabled) return;
-  const quiz = button.closest(".quiz-box");
-  const feedback = quiz.querySelector(".feedback");
-  if (button.dataset.answer !== "correct") {
-    button.classList.add("wrong");
-    button.disabled = true;
-    feedback.className = "feedback";
-    feedback.textContent = "[系统提示] 答案与现有页面记录不符，请重新选择。";
+function closeDead() {
+  if (deadDialog.hidden) return;
+  deadDialog.hidden = true;
+  document.body.classList.remove("reader-open");
+  deadReturnFocus?.focus({ preventScroll: true });
+  deadReturnFocus = null;
+}
+
+function pageFromHash() {
+  const match = location.hash.match(/^#page-(\d+)$/);
+  return match ? Number(match[1]) : 0;
+}
+
+function showPage(requestedPage, addHistory = true) {
+  let next = Math.max(0, Math.min(9, Number(requestedPage) || 0));
+  if (next === 8 && state.recoveryStep >= 7) next = 9;
+
+  screens.forEach(screen => {
+    const active = Number(screen.dataset.page) === next;
+    screen.classList.toggle("active", active);
+    screen.setAttribute("aria-hidden", active ? "false" : "true");
+  });
+
+  archiveDock.hidden = !state.storyStarted;
+  archiveDock.querySelectorAll("[data-goto]").forEach(button => {
+    button.classList.toggle("current", Number(button.dataset.goto) === next);
+  });
+
+  if (next === 0) pageCounter.textContent = "社区首页";
+  else if (next <= 7) pageCounter.textContent = `已打开档案 ${next} / 7`;
+  else if (next === 8) pageCounter.textContent = `账号恢复：密保 ${state.recoveryStep + 1} / 7`;
+  else pageCounter.textContent = "账号恢复完成";
+
+  tickerText.textContent = tickers[next];
+  document.title = next === 0
+    ? "天涯社区旧版镜像 - 全球华人网上家园"
+    : next === 8
+      ? "找回账号 - 天涯用户中心"
+      : next === 9
+        ? "该用户已注销 - ERROR 035"
+        : `${document.querySelector(`#page-${next} h1`)?.textContent?.trim() || "旧帖"} - 天涯社区旧版镜像`;
+
+  if (addHistory) history.pushState({ page: next }, "", `#page-${next}`);
+  window.scrollTo({ top: 0, behavior: "auto" });
+  document.querySelector(`#page-${next} h1, #page-${next} h2, #page-${next} button`)?.focus({ preventScroll: true });
+
+  if (next === 8) renderRecovery();
+  if (next === 9) document.querySelector("#endingTime").textContent = stamp();
+}
+
+function beginStory() {
+  state.storyStarted = true;
+  saveState();
+  showPage(1);
+}
+
+function renderRecovery() {
+  const step = Math.min(state.recoveryStep, 6);
+  recoveryForms.forEach((form, index) => {
+    form.classList.toggle("active", index === step);
+  });
+  recoveryStepNumber.textContent = String(state.recoveryStep + 1);
+  recoveryProgressBar.style.width = `${(state.recoveryStep / 7) * 100}%`;
+  pageCounter.textContent = `账号恢复：密保 ${state.recoveryStep + 1} / 7`;
+  const activeInput = recoveryForms[step]?.querySelector("input");
+  window.setTimeout(() => activeInput?.focus({ preventScroll: true }), 0);
+}
+
+function answerValue(form) {
+  const checked = form.querySelector("input[type=radio]:checked");
+  if (checked) return checked.value;
+  const textInput = form.querySelector("input:not([type=radio])");
+  if (!textInput) return "";
+  let value = textInput.value.trim().replace(/[《》\s]/g, "");
+  if (["days", "dates", "floor"].includes(form.dataset.key)) value = value.replace(/\D/g, "");
+  return value;
+}
+
+function submitRecovery(form) {
+  const index = recoveryForms.indexOf(form);
+  if (index !== state.recoveryStep) return;
+  const feedback = form.querySelector(".recovery-feedback");
+  const value = answerValue(form);
+
+  if (!value) {
+    feedback.className = "recovery-feedback";
+    feedback.textContent = "请输入或选择一个答案。";
+    return;
+  }
+  if (value !== form.dataset.answer) {
+    feedback.className = "recovery-feedback error";
+    feedback.textContent = "密保答案不匹配，请查阅公开资料后重试。";
+    form.classList.add("shake");
+    window.setTimeout(() => form.classList.remove("shake"), 320);
     return;
   }
 
-  locked = true;
-  button.classList.add("right");
-  quiz.querySelectorAll("[data-answer]").forEach(option => option.disabled = true);
-  feedback.className = "feedback ok";
-  feedback.textContent = "[验证通过] 正在打开下一份旧页……";
-  window.setTimeout(() => showPage(currentPage + 1), 680);
+  feedback.className = "recovery-feedback ok";
+  feedback.textContent = "答案匹配，正在载入下一项……";
+  state.recoveryStep += 1;
+  saveState();
+  window.setTimeout(() => {
+    if (state.recoveryStep >= 7) showPage(9);
+    else renderRecovery();
+  }, 520);
 }
 
 document.addEventListener("click", event => {
@@ -108,39 +209,78 @@ document.addEventListener("click", event => {
     openDiary(diaryLink.dataset.diary, diaryLink);
     return;
   }
-  const answer = event.target.closest("[data-answer]");
-  if (answer) handleAnswer(answer);
-  if (event.target.closest("[data-next]")) showPage(1);
+
+  const deadLink = event.target.closest("[data-dead-title]");
+  if (deadLink) {
+    openDead(deadLink.dataset.deadTitle, deadLink);
+    return;
+  }
+
+  if (event.target.closest("[data-story-trigger]")) {
+    beginStory();
+    return;
+  }
+
+  const recoveryLink = event.target.closest("[data-recovery]");
+  if (recoveryLink) {
+    if (state.storyStarted) showPage(8);
+    else openDead("账号找回", recoveryLink, "该用户不存在，或没有留下可用的账号恢复记录。");
+    return;
+  }
+
+  const pageLink = event.target.closest("[data-goto]");
+  if (pageLink) {
+    const page = Number(pageLink.dataset.goto);
+    if (page === 8 && !state.storyStarted) openDead("账号找回", pageLink, "该用户不存在，或没有留下可用的账号恢复记录。");
+    else showPage(page);
+  }
+});
+
+document.addEventListener("submit", event => {
+  const form = event.target.closest("[data-recovery-form]");
+  if (!form) return;
+  event.preventDefault();
+  submitRecovery(form);
 });
 
 document.querySelector("#closeDiaryTop").addEventListener("click", closeDiary);
 document.querySelector("#closeDiaryBottom").addEventListener("click", closeDiary);
+document.querySelector("#closeDeadTop").addEventListener("click", closeDead);
+document.querySelector("#closeDeadBottom").addEventListener("click", closeDead);
+
 diaryReader.addEventListener("click", event => {
   if (event.target === diaryReader) closeDiary();
 });
+deadDialog.addEventListener("click", event => {
+  if (event.target === deadDialog) closeDead();
+});
 document.addEventListener("keydown", event => {
-  if (event.key === "Escape") closeDiary();
+  if (event.key === "Escape") {
+    closeDiary();
+    closeDead();
+  }
 });
 
 document.querySelector("#restartButton").addEventListener("click", () => {
-  closeDiary();
-  document.querySelectorAll("[data-answer]").forEach(button => {
-    button.disabled = false;
-    button.classList.remove("wrong", "right");
-  });
-  document.querySelectorAll(".feedback").forEach(item => {
-    item.textContent = "";
-    item.className = "feedback";
+  state = { storyStarted: false, recoveryStep: 0 };
+  saveState();
+  recoveryForms.forEach(form => {
+    form.reset();
+    form.querySelector(".recovery-feedback").textContent = "";
   });
   showPage(0);
 });
 
 window.addEventListener("popstate", event => {
-  const page = Number(event.state?.page);
-  if (Number.isInteger(page)) showPage(page, false);
+  const page = Number.isInteger(Number(event.state?.page)) ? Number(event.state.page) : pageFromHash();
+  showPage(page, false);
 });
 
-document.querySelector("#todayText").textContent = stamp().slice(0, 10);
+const initialPage = pageFromHash();
+if (initialPage > 0) {
+  state.storyStarted = true;
+  saveState();
+}
 document.querySelector("#nowStamp").textContent = stamp();
-history.replaceState({ page: 0 }, "", location.pathname + location.search);
-showPage(0, false);
+history.replaceState({ page: initialPage }, "", initialPage ? `#page-${initialPage}` : location.pathname + location.search);
+showPage(initialPage, false);
