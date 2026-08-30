@@ -14,8 +14,15 @@ const recoveryProgressBar = document.querySelector("#recoveryProgressBar");
 const recoveryForms = [...document.querySelectorAll("[data-recovery-form]")];
 const threadReplies = document.querySelector("#threadReplies");
 const threadPagers = [document.querySelector("#threadPagerTop"), document.querySelector("#threadPagerBottom")];
+const threadOwnerPost = document.querySelector("#threadOwnerPost");
+const floorJumpForm = document.querySelector("#floorJumpForm");
+const floorJumpInput = document.querySelector("#floorJumpInput");
 const diaryArchive = window.DIARY_ARCHIVE || {};
-const storageKey = "yuanan-forum-mystery-v3";
+const threadSource = window.THREAD_SOURCE || { ownerPost: "", replies: [] };
+const sourceReplies = new Map((threadSource.replies || []).map(reply => [Number(reply.floor), reply]));
+const threadPageSize = 200;
+const threadPageCount = 3;
+const storageKey = "yuanan-forum-mystery-v4";
 
 const tickers = {
   0: "旧版社区仅供浏览，部分帖子及用户资料可能无法访问。",
@@ -31,22 +38,7 @@ const tickers = {
   10: "远岸社区主题浏览：帖子内容来自旧版镜像。"
 };
 
-const threadSpecialReplies = {
-  1: { user: "一直岸锋", time: "2008-03-27 20:41", html: "不是真的吧，不是说好等到35岁的么。" },
-  2: { user: "acqyacqy00", time: "2008-03-27 20:44", html: "我也刚刚从凛前辈那里听到这个消息。" },
-  7: { user: "马甲冲冲", time: "2008-03-27 21:09", html: "无语，南康是谁啊，长沙N年都没听说过……" },
-  11: { user: "眉聚江山之秀", time: "2008-03-27 21:26", html: "我是远岸的后来者，还不知道南康是谁。有人能把他以前写东西的地方发一下吗？" },
-  18: { user: "山海之间", time: "2008-03-27 22:03", html: "楼主说自己只是听过名字的网友，那短信里的细节又是从哪里来的？先留个记号。" },
-  35: { user: "旧书签", time: "2008-03-28 00:35", link: true, html: "找到了一个还可以打开的旧日记目录。里面有些文章只剩标题，有些保存了全文：<button class=\"external-link\" type=\"button\" data-goto=\"6\">[站外链接] 康康的网络日记本</button>" },
-  49: { user: "湘水北去", time: "2008-03-28 08:12", html: "日记能证明这些文字确实在网上出现过，但不能自动证明后来每一种说法。原帖、转帖和回忆要分开看。" },
-  63: { user: "目录管理员", time: "2008-03-28 10:46", link: true, html: "有人问为什么没有地方新闻。我把 3 月 26 日到 29 日的新闻目录做了镜像，关键词结果都在这里：<button class=\"external-link\" type=\"button\" data-goto=\"2\">[站外链接] 2008 年 3 月新闻目录检索</button>" },
-  76: { user: "路过长沙", time: "2008-03-28 12:30", html: "零结果只能说明现在没有找到那篇公开报道，不等于单靠这个就能证明一切都没发生。" },
-  88: { user: "开棺的备份", time: "2009-05-16 22:17", link: true, html: "一年后补链。某兴趣小组有人贴出一段‘旺仔正在理发’的完整转述，原回复账号和楼层没有保存：<button class=\"external-link\" type=\"button\" data-goto=\"3\">[站外链接] 命理研究小组旧页缓存</button>" },
-  104: { user: "只看来源", time: "2009-05-17 01:02", html: "这段话信息很多，但它依然是未署名的二次转述。谁说的、什么时候说的、原链接在哪，这些都缺。" },
-  126: { user: "账号观察员", time: "2013-04-26 07:03", link: true, html: "旧账号后来上线、日记密码被重置、再到账号注销，日期不是同一天。相关讨论备份在这里：<button class=\"external-link\" type=\"button\" data-goto=\"4\">[站外链接] 账号上线与注销记录</button>" },
-  147: { user: "午后乱码", time: "2013-04-27 13:20", html: "如果登录日记的人和登录论坛的人不是同一个，那么所谓‘死后上线’就不只有一种解释。" },
-  173: { user: "为我的天使", time: "2013-06-22 08:16", link: true, html: "关于孩子名字、骨灰去向和‘等到三十五岁’那句话，另开了一楼逐条核对：<button class=\"external-link\" type=\"button\" data-goto=\"5\">[站外链接] 关于各种网络传言的实证</button>" },
-  189: { user: "不引用截图", time: "2013-07-12 11:03", html: "澄清帖的五项里有四个证明链接已经失效。能看到结论，也要记得证据链已经残缺。" },
+const threadStoryReplies = {
   205: { user: "无名氏", time: "2015-05-27 23:44", link: true, html: "这里有人把学校名单、344 条新闻目录、旧帖转载和账号登录记录放在一楼里追查，楼数很长：<button class=\"external-link\" type=\"button\" data-goto=\"7\">[站外链接] 2015 年匿名调查楼</button>" },
   224: { user: "新闻目录组", time: "2015-05-28 00:12", html: "查到的只是目录零命中。请不要把‘没有找到’改写成‘已经证明不存在’。" },
   270: { user: "别再试密码", time: "2015-05-28 09:41", html: "有人用泄露出来的旧凭据做登录验证。每验证一次，后台就会多一个更晚的登录时间。后来的人又拿这个时间当作旧证据。" },
@@ -55,6 +47,14 @@ const threadSpecialReplies = {
   401: { user: "最后一页", time: "2015-05-29 03:11", html: "翻到这里的人已经很少了。首页显示本帖 437 回复，可我刚才明明看到的是 438。" },
   436: { user: "系统消息", time: "2015-05-29 03:34", html: "该用户的恢复记录已重新生成。请求编号：035。" },
   437: { user: "南康好友", time: "2015-05-29 03:35", link: true, html: "你已经打开了所有被转贴过的页面。还要继续登录吗？<button class=\"external-link danger-link\" type=\"button\" data-goto=\"8\">[用户中心] 恢复“南康好友”账号</button>" }
+};
+
+const threadClueAttachments = {
+  35: { page: 6, label: "康康的网络日记本", note: "本楼后来被镜像管理员关联到一份旧日记目录。" },
+  63: { page: 2, label: "2008 年 3 月新闻目录检索", note: "相关页面：地方新闻目录镜像。" },
+  88: { page: 3, label: "命理研究小组旧页缓存", note: "相关页面：一段来源不明的完整转述。" },
+  126: { page: 4, label: "账号上线与注销记录", note: "相关页面：旧账号登录记录讨论。" },
+  173: { page: 5, label: "关于各种网络传言的实证", note: "相关页面：网友整理的逐条澄清。" }
 };
 
 const genericReplyTexts = [
@@ -101,8 +101,8 @@ function loadState() {
     return {
       storyStarted: Boolean(saved?.storyStarted),
       recoveryStep: Math.max(0, Math.min(7, Number(saved?.recoveryStep) || 0)),
-      threadPage: Math.max(1, Math.min(9, Number(saved?.threadPage) || 1)),
-      threadMode: saved?.threadMode === "links" ? "links" : "all",
+      threadPage: Math.max(1, Math.min(threadPageCount, Number(saved?.threadPage) || 1)),
+      threadMode: "all",
       ordinaryTitle: typeof saved?.ordinaryTitle === "string" ? saved.ordinaryTitle : "十年前的网吧，现在还有人记得吗"
     };
   } catch {
@@ -124,6 +124,10 @@ function stamp(date = new Date()) {
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[character]);
+}
+
+function textToHtml(value) {
+  return escapeHtml(value || "").replace(/\n/g, "<br>");
 }
 
 function openDiary(title, trigger) {
@@ -177,7 +181,18 @@ function replyDate(floor) {
 }
 
 function buildMainReply(floor) {
-  if (threadSpecialReplies[floor]) return { floor, ...threadSpecialReplies[floor] };
+  const sourceReply = sourceReplies.get(floor);
+  if (sourceReply) {
+    return {
+      floor,
+      user: sourceReply.user,
+      time: sourceReply.time,
+      html: textToHtml(sourceReply.text),
+      link: Boolean(threadClueAttachments[floor]),
+      sourced: true
+    };
+  }
+  if (threadStoryReplies[floor]) return { floor, ...threadStoryReplies[floor] };
   return {
     floor,
     user: replyUsers[floor % replyUsers.length],
@@ -188,27 +203,31 @@ function buildMainReply(floor) {
 }
 
 function renderMainThread() {
+  threadOwnerPost.innerHTML = textToHtml(threadSource.ownerPost);
   const allReplies = Array.from({ length: 437 }, (_, index) => buildMainReply(index + 1));
-  const visibleReplies = state.threadMode === "links" ? allReplies.filter(reply => reply.link) : allReplies;
-  const pageCount = state.threadMode === "links" ? 1 : 9;
-  if (state.threadPage > pageCount) state.threadPage = pageCount;
-  const start = state.threadMode === "links" ? 0 : (state.threadPage - 1) * 50;
-  const pageReplies = state.threadMode === "links" ? visibleReplies : visibleReplies.slice(start, start + 50);
+  if (state.threadPage > threadPageCount) state.threadPage = threadPageCount;
+  const start = (state.threadPage - 1) * threadPageSize;
+  const pageReplies = allReplies.slice(start, start + threadPageSize);
 
   threadReplies.innerHTML = pageReplies.map(reply => `
-    <div class="floor ${reply.link ? "link-floor" : ""}" id="floor-${reply.floor}">
-      <span><b>${reply.floor}#</b>　${escapeHtml(reply.user)}<small>${escapeHtml(reply.time)}</small></span>
-      <p>${reply.html}</p>
-    </div>`).join("");
+    <article class="archive-floor ${reply.link ? "link-floor" : ""}" id="floor-${reply.floor}">
+      <header class="archive-floor-head">
+        <span>作者：<b>${escapeHtml(reply.user)}</b></span><span>时间：${escapeHtml(reply.time)}</span>
+        <span class="archive-floor-actions">回复　举报　${reply.floor}楼</span>
+      </header>
+      <div class="archive-floor-body">
+        <div class="archive-reply-text">${reply.html}</div>
+        ${threadClueAttachments[reply.floor] ? `<div class="clue-attachment"><span>${escapeHtml(threadClueAttachments[reply.floor].note)}</span><button class="external-link" type="button" data-goto="${threadClueAttachments[reply.floor].page}">[关联网页] ${escapeHtml(threadClueAttachments[reply.floor].label)}</button></div>` : ""}
+      </div>
+    </article>`).join("");
 
-  const pagerHtml = state.threadMode === "links" ? `<span>共 ${visibleReplies.length} 条带链接回复</span>` : Array.from({ length: 9 }, (_, index) => {
+  const pagerHtml = Array.from({ length: threadPageCount }, (_, index) => {
     const page = index + 1;
     return `<button type="button" data-thread-page="${page}" class="${page === state.threadPage ? "current" : ""}">${page}</button>`;
-  }).join("");
+  }).join("") + `<span>　共 ${threadPageCount} 页 / 437 楼</span>`;
   threadPagers.forEach(pager => { pager.innerHTML = pagerHtml; });
-  document.querySelectorAll("[data-thread-mode]").forEach(button => button.classList.toggle("selected", button.dataset.threadMode === state.threadMode));
   if (document.querySelector("#page-1").classList.contains("active")) {
-    pageCounter.textContent = state.threadMode === "links" ? `带链接回复：${visibleReplies.length} 条` : `主题回复：第 ${state.threadPage} / 9 页`;
+    pageCounter.textContent = `主题回复：第 ${state.threadPage} / ${threadPageCount} 页`;
   }
 }
 
@@ -247,7 +266,7 @@ function showPage(requestedPage, addHistory = true) {
   });
 
   if (next === 0) pageCounter.textContent = "社区首页";
-  else if (next === 1) pageCounter.textContent = state.threadMode === "links" ? "带链接回复：7 条" : `主题回复：第 ${state.threadPage} / 9 页`;
+  else if (next === 1) pageCounter.textContent = `主题回复：第 ${state.threadPage} / ${threadPageCount} 页`;
   else if (next >= 2 && next <= 7) pageCounter.textContent = "站外链接页面";
   else if (next === 8) pageCounter.textContent = `账号恢复：密保 ${state.recoveryStep + 1} / 7`;
   else if (next === 9) pageCounter.textContent = "账号恢复完成";
@@ -262,7 +281,7 @@ function showPage(requestedPage, addHistory = true) {
         ? "该用户已注销 - ERROR 035"
         : next === 10
           ? `${state.ordinaryTitle} - 远岸社区`
-          : `${document.querySelector(`#page-${next} h1`)?.textContent?.trim() || "旧帖"} - 旧页镜像`;
+          : `${document.querySelector(`#page-${next} h1, #page-${next} [id^="title-"]`)?.textContent?.trim() || "旧帖"} - 旧页镜像`;
 
   if (addHistory) history.pushState({ page: next }, "", `#page-${next}`);
   window.scrollTo({ top: 0, behavior: "auto" });
@@ -352,14 +371,6 @@ document.addEventListener("click", event => {
     beginStory();
     return;
   }
-  const threadMode = event.target.closest("[data-thread-mode]");
-  if (threadMode) {
-    state.threadMode = threadMode.dataset.threadMode;
-    state.threadPage = 1;
-    saveState();
-    renderMainThread();
-    return;
-  }
   const threadPage = event.target.closest("[data-thread-page]");
   if (threadPage) {
     state.threadPage = Number(threadPage.dataset.threadPage);
@@ -383,6 +394,15 @@ document.addEventListener("click", event => {
 });
 
 document.addEventListener("submit", event => {
+  if (event.target === floorJumpForm) {
+    event.preventDefault();
+    const floor = Math.max(1, Math.min(437, Number(floorJumpInput.value) || 1));
+    state.threadPage = Math.ceil(floor / threadPageSize);
+    saveState();
+    renderMainThread();
+    requestAnimationFrame(() => document.querySelector(`#floor-${floor}`)?.scrollIntoView({ block: "start" }));
+    return;
+  }
   const form = event.target.closest("[data-recovery-form]");
   if (!form) return;
   event.preventDefault();

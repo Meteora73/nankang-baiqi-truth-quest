@@ -338,15 +338,27 @@ nav button:hover, nav button:focus-visible { color: #ffef8c; background: #173f69
 .thread-toolbar { display: flex; align-items: center; justify-content: space-between; margin-top: 9px; padding: 5px 8px; color: #66798a; background: #edf3f7; border: 1px solid #9fb2c3; }
 .thread-toolbar button { padding: 3px 9px; color: #174f80; background: #fff; border: 1px solid #9bb0c1; cursor: pointer; }
 .thread-toolbar button.selected { color: #fff; background: #315f89; }
+.floor-jump { display: flex; align-items: center; gap: 4px; }
+.floor-jump label { color: #66798a; }
+.floor-jump input { width: 50px; height: 23px; padding: 1px 4px; border: 1px solid #9bb0c1; font: 12px Tahoma, SimSun, sans-serif; }
 .thread-pagination { min-height: 33px; display: flex; align-items: center; gap: 4px; padding: 5px 3px; }
 .thread-pagination button { min-width: 27px; height: 25px; color: #164e80; background: #fff; border: 1px solid #94aabd; cursor: pointer; }
 .thread-pagination button.current { color: #fff; background: #315f89; font-weight: bold; }
 .thread-pagination span { color: #6b7d8e; }
-.tianya-floors .floor span small { display: block; margin-top: 3px; color: #8b9aa7; font-size: 10px; }
-.tianya-floors .floor span b { color: #183f67; }
-.tianya-floors .floor p { min-width: 0; }
-.link-floor { background: #fffdea; }
-.link-floor span { background: #f4efcf; }
+.archive-post, .archive-floor { color: #333; background: #fff; border: 1px solid #c9c9c9; font-family: Tahoma, SimSun, sans-serif; }
+.archive-post { border-top: 0; }
+.archive-floor { margin-bottom: 9px; }
+.archive-floor-head { min-height: 33px; display: flex; align-items: center; gap: 22px; padding: 5px 10px; color: #777; background: #f3f3f3; border-bottom: 1px solid #d4d4d4; font-size: 12px; }
+.archive-floor-head b { color: #275f8f; font-weight: normal; }
+.archive-floor-actions { margin-left: auto; color: #999; white-space: nowrap; }
+.archive-op-title { padding: 13px 18px 8px; color: #164e80; font-size: 18px; font-weight: bold; }
+.archive-floor-body { min-height: 72px; padding: 19px 25px 23px; font-size: 14px; line-height: 1.9; overflow-wrap: anywhere; }
+.archive-op-body { min-height: 320px; padding-top: 9px; line-height: 2; }
+.archive-signature { margin: 0 18px; padding: 7px 0 10px; color: #aaa; border-top: 1px dotted #ccc; font-size: 11px; text-align: right; }
+.link-floor { border-color: #b9b080; }
+.link-floor .archive-floor-head { background: #f5f3e8; }
+.clue-attachment { margin-top: 17px; padding: 8px 10px; color: #777; background: #fffdf0; border: 1px dashed #c9bd7d; font-size: 12px; line-height: 1.7; }
+.clue-attachment span { display: block; }
 .external-link { display: inline; margin: 2px 0; padding: 0; color: #003399; background: transparent; border: 0; cursor: pointer; font-weight: bold; text-decoration: underline; }
 .external-link::before { content: "↗ "; color: #9b1d1d; text-decoration: none; }
 .danger-link { color: #9d1010; }
@@ -438,9 +450,15 @@ nav button:hover, nav button:focus-visible { color: #ffef8c; background: #173f69
   .recovery-actions { display: block; margin: 13px 10px 0; }
   .recovery-actions span { display: block; margin-top: 5px; }
   .thread-toolbar { align-items: flex-start; gap: 6px; }
-  .thread-toolbar > div { display: flex; flex-direction: column; gap: 4px; }
-  .thread-toolbar span { text-align: right; font-size: 10px; }
+  .thread-toolbar > div { display: flex; gap: 4px; }
+  .floor-jump { align-self: center; }
   .thread-pagination { overflow-x: auto; }
+  .archive-floor-head { flex-wrap: wrap; gap: 3px 12px; padding: 6px 8px; }
+  .archive-floor-actions { width: 100%; margin-left: 0; text-align: right; }
+  .archive-op-title { padding: 11px 10px 6px; font-size: 16px; }
+  .archive-floor-body { min-height: 60px; padding: 13px 11px 17px; font-size: 13px; line-height: 1.85; }
+  .archive-op-body { line-height: 1.9; }
+  .archive-signature { margin: 0 10px; }
   .return-thread-bar { align-items: flex-start; }
   .return-thread-bar span { max-width: 45%; text-align: right; }
 }
