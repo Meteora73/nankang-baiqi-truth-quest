@@ -2,6 +2,12 @@ const screens = [...document.querySelectorAll(".screen")];
 history.scrollRestoration = "manual";
 const pageCounter = document.querySelector("#pageCounter");
 const tickerText = document.querySelector("#tickerText");
+const diaryReader = document.querySelector("#diaryReader");
+const diaryReaderTitle = document.querySelector("#diaryReaderTitle");
+const diaryReaderCrumb = document.querySelector("#diaryReaderCrumb");
+const diaryReaderMeta = document.querySelector("#diaryReaderMeta");
+const diaryReaderText = document.querySelector("#diaryReaderText");
+const diaryArchive = window.DIARY_ARCHIVE || {};
 const tickers = [
   "2008 年旧帖镜像恢复完成，请勿重复登录已注销账号。",
   "天涯旧帖首页恢复 205 条回复，楼主自述只听过南康的名字。",
@@ -15,6 +21,7 @@ const tickers = [
 ];
 let currentPage = 0;
 let locked = false;
+let diaryReturnFocus = null;
 
 function pad(value) {
   return String(value).padStart(2, "0");
@@ -22,6 +29,34 @@ function pad(value) {
 
 function stamp(date = new Date()) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
+function openDiary(title, trigger) {
+  const content = diaryArchive[title];
+  diaryReturnFocus = trigger;
+  diaryReaderTitle.textContent = title;
+  diaryReaderCrumb.textContent = title;
+  diaryReaderText.classList.toggle("missing", !content);
+
+  if (content) {
+    diaryReaderMeta.textContent = "正文来源：天涯《南康的网络日记本》存档　｜　支线阅读不影响答题";
+    diaryReaderText.textContent = content;
+  } else {
+    diaryReaderMeta.textContent = "年轮目录标题已恢复　｜　单篇正文没有留下可读取的存档";
+    diaryReaderText.textContent = "该内容不存在\n\n目录记录仍在，但正文未被保存。";
+  }
+
+  diaryReader.hidden = false;
+  document.body.classList.add("reader-open");
+  document.querySelector("#closeDiaryTop").focus();
+}
+
+function closeDiary() {
+  if (diaryReader.hidden) return;
+  diaryReader.hidden = true;
+  document.body.classList.remove("reader-open");
+  diaryReturnFocus?.focus({ preventScroll: true });
+  diaryReturnFocus = null;
 }
 
 function showPage(index, addHistory = true) {
@@ -68,12 +103,27 @@ function handleAnswer(button) {
 }
 
 document.addEventListener("click", event => {
+  const diaryLink = event.target.closest("[data-diary]");
+  if (diaryLink) {
+    openDiary(diaryLink.dataset.diary, diaryLink);
+    return;
+  }
   const answer = event.target.closest("[data-answer]");
   if (answer) handleAnswer(answer);
   if (event.target.closest("[data-next]")) showPage(1);
 });
 
+document.querySelector("#closeDiaryTop").addEventListener("click", closeDiary);
+document.querySelector("#closeDiaryBottom").addEventListener("click", closeDiary);
+diaryReader.addEventListener("click", event => {
+  if (event.target === diaryReader) closeDiary();
+});
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closeDiary();
+});
+
 document.querySelector("#restartButton").addEventListener("click", () => {
+  closeDiary();
   document.querySelectorAll("[data-answer]").forEach(button => {
     button.disabled = false;
     button.classList.remove("wrong", "right");
