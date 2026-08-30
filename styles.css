@@ -300,13 +300,6 @@ footer p { margin: 4px; }
 nav button { height: 28px; min-width: 116px; padding: 0 20px; color: #fff; background: transparent; border: 0; border-right: 1px solid #7d9db8; cursor: pointer; font-weight: bold; }
 nav button:hover, nav button:focus-visible { color: #ffef8c; background: #173f69; outline: 1px dotted #fff; outline-offset: -3px; }
 
-.archive-dock[hidden] { display: none; }
-.archive-dock { display: flex; align-items: center; gap: 0; min-height: 36px; padding: 4px 8px; color: #435b71; background: #f1f5f8; border-bottom: 1px solid #9eb3c5; overflow-x: auto; white-space: nowrap; }
-.archive-dock b { margin-right: 6px; color: #8a1d1d; }
-.archive-dock button { flex: 0 0 auto; padding: 2px 7px; color: #164f87; background: transparent; border: 0; border-right: 1px solid #a9b9c7; cursor: pointer; text-decoration: underline; }
-.archive-dock button.current { color: #fff; background: #2f5f8f; text-decoration: none; }
-.archive-dock .recover-link { color: #8e1e1e; font-weight: bold; }
-
 .forum-portal { display: grid; grid-template-columns: minmax(0, 1fr) 225px; gap: 8px; }
 .portal-left, .portal-right { display: flex; flex-direction: column; gap: 8px; }
 .panel-title span { float: right; color: #dbe9f5; font-weight: normal; }
@@ -341,6 +334,29 @@ nav button:hover, nav button:focus-visible { color: #ffef8c; background: #173f69
 .portal-right .counter { margin: 0; }
 
 .screen > .quiz-box { display: none; }
+
+.thread-toolbar { display: flex; align-items: center; justify-content: space-between; margin-top: 9px; padding: 5px 8px; color: #66798a; background: #edf3f7; border: 1px solid #9fb2c3; }
+.thread-toolbar button { padding: 3px 9px; color: #174f80; background: #fff; border: 1px solid #9bb0c1; cursor: pointer; }
+.thread-toolbar button.selected { color: #fff; background: #315f89; }
+.thread-pagination { min-height: 33px; display: flex; align-items: center; gap: 4px; padding: 5px 3px; }
+.thread-pagination button { min-width: 27px; height: 25px; color: #164e80; background: #fff; border: 1px solid #94aabd; cursor: pointer; }
+.thread-pagination button.current { color: #fff; background: #315f89; font-weight: bold; }
+.thread-pagination span { color: #6b7d8e; }
+.tianya-floors .floor span small { display: block; margin-top: 3px; color: #8b9aa7; font-size: 10px; }
+.tianya-floors .floor span b { color: #183f67; }
+.tianya-floors .floor p { min-width: 0; }
+.link-floor { background: #fffdea; }
+.link-floor span { background: #f4efcf; }
+.external-link { display: inline; margin: 2px 0; padding: 0; color: #003399; background: transparent; border: 0; cursor: pointer; font-weight: bold; text-decoration: underline; }
+.external-link::before { content: "↗ "; color: #9b1d1d; text-decoration: none; }
+.danger-link { color: #9d1010; }
+.thread-end-note { padding: 10px 13px; color: #66717b; background: #f1f3f4; border: 1px solid #b8c1c8; }
+.return-thread-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; padding: 5px 8px; color: #7d6d46; background: #fffbe4; border: 1px solid #cbbb77; }
+.return-thread-bar button { color: #174f80; background: transparent; border: 0; cursor: pointer; font-weight: bold; text-decoration: underline; }
+.return-thread-bar span { font-size: 10px; }
+.ordinary-op { min-height: 245px; }
+.ordinary-avatar { color: #526d85; background: #f3f6f8; }
+.ordinary-back { padding: 13px 0; text-align: center; }
 
 .recovery-shell { min-height: 510px; display: grid; grid-template-columns: 170px minmax(0, 1fr); background: #fff; border: 1px solid #859eb4; }
 .recovery-sidebar { background: #eaf1f7; border-right: 1px solid #a7bacb; }
@@ -399,7 +415,6 @@ nav button:hover, nav button:focus-visible { color: #ffef8c; background: #173f69
   .brand-slogan small { font-size: 9px; }
   .header-ad { display: none; }
   nav button { flex: 0 0 auto; min-width: 86px; padding: 0 10px; }
-  .archive-dock { min-height: 40px; }
   .forum-portal { grid-template-columns: 1fr; }
   .welcome-row { display: block; }
   .quick-login { display: none; }
@@ -422,4 +437,10 @@ nav button:hover, nav button:focus-visible { color: #ffef8c; background: #173f69
   .verify-button { width: 100%; min-height: 42px; }
   .recovery-actions { display: block; margin: 13px 10px 0; }
   .recovery-actions span { display: block; margin-top: 5px; }
+  .thread-toolbar { align-items: flex-start; gap: 6px; }
+  .thread-toolbar > div { display: flex; flex-direction: column; gap: 4px; }
+  .thread-toolbar span { text-align: right; font-size: 10px; }
+  .thread-pagination { overflow-x: auto; }
+  .return-thread-bar { align-items: flex-start; }
+  .return-thread-bar span { max-width: 45%; text-align: right; }
 }
