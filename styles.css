@@ -66,7 +66,13 @@ main { min-height: 620px; background: #f8fafc; }
 .post-meta { margin: 0 -18px 22px; padding: 6px 9px; display: flex; justify-content: space-between; gap: 10px; color: #4e6578; background: #eef4f8; border-bottom: 1px solid #a9bdce; font-size: 12px; }
 .post-meta strong { color: #153f68; font-size: 14px; }
 .quote { width: 80%; margin: 20px auto; padding: 13px 18px; color: #444; background: #f3f3eb; border: 1px solid #c6c3ae; font-size: 16px; }
+.opener { padding-bottom: 8px; color: #333; border-bottom: 1px dotted #aaa; font: bold 17px/1.8 STKaiti, KaiTi, serif; }
+.data-gap { margin: 16px 0; padding: 4px 9px; color: #888; background: #f0f0f0; border: 1px dashed #bbb; text-align: center; font: 11px "Courier New", monospace; }
 .attachment { margin-top: 38px; padding: 7px; color: #576c7d; background: #eef4f8; border: 1px dashed #8da7bd; font-size: 12px; }
+.floor-list { background: #fff; border: 1px solid #829db6; border-top: 0; }
+.floor { display: grid; grid-template-columns: 210px 1fr; min-height: 58px; border-top: 1px solid #ccd8e1; }
+.floor span { padding: 10px 12px; color: #315a7b; background: #edf3f7; border-right: 1px solid #ccd8e1; }
+.floor p { margin: 0; padding: 10px 14px; font-size: 13px; }
 
 .quiz-box { margin-top: 12px; padding: 16px 20px 18px; background: #fff; border: 2px solid var(--blue); }
 .quiz-title { display: inline-block; margin: -16px 0 13px -20px; padding: 2px 14px; color: #fff; background: var(--blue); font-weight: bold; }
@@ -96,6 +102,8 @@ main { min-height: 620px; background: #f8fafc; }
 .archive-table tr:nth-child(even), .log-table tr:nth-child(even), .diary-table tr:nth-child(even) { background: #eef4f8; }
 .archive-table .total { font-weight: bold; background: #fff8d7; }
 .small-note { color: #777; font-size: 11px; }
+.search-record { margin-top: 16px; padding: 10px 13px; color: #555; background: #f7f7f7; border: 1px solid #ddd; }
+.search-record p { margin: 3px 0; }
 
 .group-topic { padding: 18px 22px 26px; background: #fff; border: 1px solid #b9c5b4; }
 .group-top { margin: -18px -22px 20px; padding: 8px 12px; color: #444; background: #edf2ea; border-bottom: 1px solid #bbc7b8; }
@@ -104,6 +112,11 @@ main { min-height: 620px; background: #f8fafc; }
 .group-topic h1 { margin: 0; font-size: 22px; font-weight: normal; }
 .topic-meta { color: #999; }
 .group-topic blockquote { margin: 18px 0; padding: 12px 16px; color: #555; background: #f4f4f0; border-left: 4px solid #b9c5b4; }
+.source-label { margin-top: 18px; color: #777; font-weight: bold; }
+.group-topic .long-quote { max-height: 315px; overflow-y: auto; border: 1px solid #d8d8d0; border-left: 4px solid #b9c5b4; }
+.long-quote p { margin: 0 0 10px; }
+.long-quote p:last-child { margin-bottom: 0; }
+.cache-check { margin-top: 18px; }
 .missing-source { padding: 12px; background: #fff8dc; border: 1px dashed #b99c53; font-family: "Courier New", monospace; }
 .reply { margin-top: 22px; padding-top: 12px; border-top: 1px solid #ddd; }
 .reply b { color: #338060; }
@@ -115,6 +128,31 @@ main { min-height: 620px; background: #f8fafc; }
 .status-warn { color: var(--red); }
 .system-mail { margin-top: 20px; padding: 10px 13px; background: #fffbe2; border: 1px solid #cdbd69; }
 .system-mail p { margin: 5px 0; }
+
+.tieba-page { overflow: hidden; }
+.tieba-bar { padding: 8px 12px; color: #e7f0f8; background: #245b91; border-bottom: 3px solid #6ea0cf; }
+.tieba-bar span { color: #fff; font: bold 20px Arial, sans-serif; }
+.tieba-bar a { float: right; color: #fff; }
+.tieba-page > h1 { margin: 15px 18px 4px; color: #204f7b; font-size: 18px; }
+.thread-meta { margin: 0 18px 14px; color: #888; }
+.tieba-floor { display: grid; grid-template-columns: 125px 1fr; border-top: 1px solid #c2d2e0; }
+.tieba-floor aside { padding: 12px 9px; color: #55718a; background: #eaf2f8; border-right: 1px solid #c2d2e0; text-align: center; }
+.tieba-floor aside b, .tieba-floor aside span, .tieba-floor aside small { display: block; }
+.tieba-floor aside b { color: #8b5a29; }
+.tieba-floor aside span { margin: 5px 0; color: #18548a; }
+.tieba-floor aside small { color: #888; font-size: 10px; }
+.tieba-floor > div { min-height: 90px; padding: 12px 17px; font-size: 13px; }
+.op-floor > div { min-height: 235px; }
+.timeline-strip { display: flex; align-items: center; gap: 7px; margin: 12px 0; padding: 9px 10px; background: #fff8dc; border: 1px dashed #bc9e54; font-size: 11px; }
+.timeline-strip b { color: #8b2f25; }
+.timeline-strip i { color: #999; font-style: normal; }
+.thread-tail { padding: 5px 12px; color: #777; background: #f2f5f7; border-top: 1px solid #c2d2e0; text-align: right; font-size: 11px; }
+.claim-list { margin: 8px 0 12px; padding-left: 25px; }
+.claim-list li { margin: 5px 0; }
+.dead-links { color: #9b2525; font-size: 11px; }
+.related-threads { padding: 12px 16px; background: #fff9df; border-top: 3px double #c5ad61; }
+.related-threads p { margin: 7px 0; }
+.related-threads span { color: #234f77; font-weight: bold; }
 
 .db-window { color: #d7e7d3; background: #071107; border: 3px outset #aab3aa; font: 13px/1.7 "Courier New", monospace; }
 .window-bar { padding: 4px 7px; color: #000; background: #bfc8bf; border-bottom: 2px ridge #ddd; font-family: SimSun, "宋体", sans-serif; }
@@ -132,6 +170,12 @@ main { min-height: 620px; background: #f8fafc; }
 .lit-intro { padding: 8px 12px; background: #fff6d8; border: 1px dashed #c9ab4e; }
 .diary-table .locked { color: var(--red); background: #eee !important; font-weight: bold; }
 .recover-note { margin-top: 15px; padding: 9px; color: #666; border: 1px dashed #c789a5; }
+.diary-grid { display: grid; grid-template-columns: repeat(2, 1fr); margin-bottom: 16px; border-top: 1px solid #d8b5c5; border-left: 1px solid #d8b5c5; }
+.diary-grid span { display: flex; justify-content: space-between; gap: 8px; padding: 5px 8px; color: #7f2750; background: #fff; border-right: 1px solid #d8b5c5; border-bottom: 1px solid #d8b5c5; }
+.diary-grid small { color: #999; }
+.diary-entry { padding: 13px 16px; color: #43343b; background: #fff; border: 1px solid #d8b5c5; box-shadow: 2px 2px 0 #f0dce5; }
+.diary-entry h2 { margin: 0 0 10px; color: #8c2856; font: bold 18px STKaiti, KaiTi, serif; }
+.diary-entry p { margin: 8px 0; text-indent: 2em; }
 
 .xq-page { background: #fff; border: 1px solid #aeb5a9; }
 .xq-title { padding: 7px 10px; color: #5b315d; background: #e8dbea; border-bottom: 1px solid #bdaac0; }
@@ -139,6 +183,8 @@ main { min-height: 620px; background: #f8fafc; }
 .xq-post { padding: 10px 14px; border-top: 1px solid #d7d7d7; }
 .xq-post b { color: #8a5f8e; font-weight: normal; }
 .xq-post p { margin: 7px 0; font-size: 13px; }
+.password-floor { background: #fff9df; }
+.password-floor .redacted { color: #8b0000; font-family: "Courier New", monospace; }
 .ghost-reply { color: #6d0000; background: #f3eeee; animation: ghostReply 2.2s steps(1) infinite; }
 @keyframes ghostReply { 0%, 92%, 100% { visibility: visible; } 93%, 98% { visibility: hidden; } }
 
@@ -185,6 +231,9 @@ footer p { margin: 4px; }
   .post-meta { margin: 0 -10px 15px; display: block; }
   .post-meta span { display: block; margin-top: 4px; }
   .quote { width: 100%; }
+  .floor { grid-template-columns: 1fr; }
+  .floor span { padding: 5px 9px; border-right: 0; border-bottom: 1px dotted #ccd8e1; }
+  .floor p { padding: 8px 9px; }
   .quiz-box { padding: 14px 12px; }
   .quiz-title { margin: -14px 0 12px -12px; }
   .answers { display: grid; grid-template-columns: 1fr; }
@@ -193,11 +242,19 @@ footer p { margin: 4px; }
   .group-top { margin-left: -12px; margin-right: -12px; }
   .uc-title { margin-left: -12px; margin-right: -12px; }
   .uc-title b { float: none; display: block; }
+  .tieba-floor { grid-template-columns: 82px 1fr; }
+  .tieba-floor aside { padding: 9px 4px; }
+  .tieba-floor > div { padding: 10px; font-size: 12px; }
+  .timeline-strip { display: grid; grid-template-columns: 1fr; gap: 2px; }
+  .timeline-strip i { transform: rotate(90deg); justify-self: center; }
+  .related-threads { padding: 10px; }
   .archive-table th, .archive-table td, .log-table td, .diary-table td { padding: 6px 4px; font-size: 11px; }
   .db-content { padding: 13px 10px; }
   .db-content pre { font-size: 11px; }
   .literature-page { padding-left: 12px; padding-right: 12px; }
   .lit-header, .lit-nav { margin-left: -12px; margin-right: -12px; padding-left: 12px; padding-right: 12px; }
+  .diary-grid { grid-template-columns: 1fr; }
+  .diary-entry { padding: 10px 12px; }
   .xq-post p { font-size: 12px; }
   .ending-page { margin: 18px 4px; padding: 24px 18px; }
   .error-code { font-size: 26px; }
