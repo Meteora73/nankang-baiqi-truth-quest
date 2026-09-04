@@ -403,6 +403,61 @@ nav button:hover, nav button:focus-visible { color: #ffef8c; background: #173f69
 .shake { animation: shake .28s linear; }
 @keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
 
+body.ghost-mode { background-color: #d8dde1; }
+body.ghost-mode .masthead, body.ghost-mode .page-status, body.ghost-mode footer { filter: saturate(.72); }
+body.identity-slip .masthead nav { background: #243e58; }
+body.identity-slip .ticker { color: #5f1717; }
+.ghost-forum-head span { transition: color .4s; }
+.ghost-system-line { min-height: 34px; display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; color: #666; background: #ececec; border: 1px solid #c4c4c4; border-top: 0; font: 12px Tahoma, SimSun, sans-serif; }
+.ghost-system-line::before { content: ""; width: 7px; height: 7px; margin-right: 8px; background: #818181; border-radius: 50%; animation: systemPulse 1.2s steps(2) infinite; }
+.ghost-system-line span { flex: 1; }
+.sound-toggle { padding: 2px 7px; color: #666; background: #f7f7f7; border: 1px solid #aaa; font: 11px Tahoma, SimSun, sans-serif; cursor: pointer; }
+.ghost-seed-floor { margin-top: 9px; opacity: .64; }
+.manifest-floor { animation: restoredFloor .48s steps(3); box-shadow: 0 0 0 1px rgba(75, 0, 0, .03); }
+.manifest-floor .archive-floor-head { background: #f0f0f0; }
+.manifest-floor .archive-floor-body { min-height: 86px; }
+.manifest-floor:nth-child(n+3) .archive-floor-head b { color: #6c2424; }
+.ghost-continue { margin: 16px 0 8px; padding: 16px; color: #5d6062; background: #f2f2f2; border: 1px solid #b7b7b7; text-align: center; }
+.ghost-continue[hidden] { display: none; }
+.ghost-continue p { margin: 0 0 10px; }
+@keyframes restoredFloor { 0% { opacity: 0; transform: translateY(3px); } 45% { opacity: .18; } 52% { opacity: 0; } 100% { opacity: 1; transform: none; } }
+@keyframes systemPulse { 50% { background: #701b1b; } }
+
+.post-editor-window { color: #333; background: #eee; border: 1px solid #7f98ad; box-shadow: 4px 4px 0 #bdc7cf; font: 13px Tahoma, SimSun, sans-serif; }
+.post-editor-title { display: flex; align-items: center; justify-content: space-between; padding: 7px 11px; color: #fff; background: #294e72; }
+.post-editor-title span { color: #d7e3ed; font-size: 11px; }
+.post-editor-account { padding: 9px 14px; color: #777; background: #f5f5f5; border-bottom: 1px solid #ccc; }
+.post-editor-account strong { color: #315f89; }
+body.identity-slip .post-editor-account strong { color: #7a1717; }
+#possessionPostForm { padding: 18px 20px 20px; }
+.editor-title-label, .editor-body-label { display: block; margin-bottom: 12px; font-weight: bold; }
+.editor-title-label span { color: #555; }
+.editor-title-label input { width: 120px; height: 29px; padding: 3px 5px; border: 2px inset #ddd; font: 14px SimSun, serif; }
+.editor-instruction { margin: -4px 0 15px 43px; color: #888; font-size: 11px; }
+.editor-body-label textarea { width: 100%; height: 285px; display: block; margin-top: 7px; padding: 12px; resize: vertical; color: #333; background: #fff; border: 2px inset #ddd; font: 14px/1.85 SimSun, serif; }
+.editor-actions { display: flex; justify-content: space-between; margin: 10px 0 0 43px; }
+.publish-button { min-width: 88px; }
+.publish-button:disabled { color: #999; }
+.compose-warning { min-height: 32px; margin: 13px 0 0 43px; color: #641818; font: 14px STKaiti, KaiTi, serif; }
+.warning-flash { animation: warningFlash .55s steps(2); }
+@keyframes warningFlash { 50% { color: transparent; } }
+
+.publish-success { margin-bottom: 8px; padding: 8px 11px; color: #2b662b; background: #edf7e9; border: 1px solid #9bb690; }
+.possession-post { margin-bottom: 9px; }
+.possession-reply { display: none; }
+.possession-reply.revealed { display: block; animation: restoredFloor .35s steps(2); }
+.blackout-ending { position: fixed; z-index: 100; inset: 0; display: grid; place-items: center; overflow: hidden; color: #aaa; background: #000; opacity: 0; pointer-events: none; transition: opacity .35s steps(3); }
+.blackout-ending.active { opacity: 1; pointer-events: auto; }
+.blackout-noise { position: absolute; inset: -25%; opacity: .06; background-image: repeating-radial-gradient(circle at 17% 23%, #fff 0 1px, transparent 1px 4px); animation: noiseShift .16s steps(2) infinite; }
+.blackout-message { position: relative; width: min(680px, calc(100% - 40px)); opacity: 0; transform: scale(1.015); text-align: center; transition: opacity .12s, transform 1.8s; font: 13px/2 "Courier New", SimSun, monospace; }
+.blackout-ending.message-visible .blackout-message { opacity: 1; transform: scale(1); }
+.blackout-message h1 { margin: 0 0 42px; color: #a90000; text-shadow: 0 0 9px rgba(180, 0, 0, .4); font: bold clamp(27px, 5vw, 54px)/1.25 SimHei, sans-serif; letter-spacing: .12em; }
+.blackout-message p { color: #777; }
+.blackout-message b { color: #a60000; }
+.blackout-message button { margin-top: 45px; padding: 5px 12px; color: #555; background: transparent; border: 1px solid #292929; cursor: pointer; font: 11px SimSun, serif; }
+.blackout-message button:hover, .blackout-message button:focus-visible { color: #aaa; border-color: #555; }
+@keyframes noiseShift { 0% { transform: translate(-2%, 1%); } 50% { transform: translate(2%, -1%); } 100% { transform: translate(-1%, -2%); } }
+
 .dead-dialog[hidden] { display: none; }
 .dead-dialog { position: fixed; z-index: 40; inset: 0; display: grid; place-items: center; padding: 14px; background: rgba(0,0,0,.48); }
 .dead-window { width: min(430px, 100%); color: #111; background: #ece9d8; border: 3px outset #f5f3e8; box-shadow: 7px 7px 0 rgba(0,0,0,.35); font-family: Tahoma, SimSun, sans-serif; }
@@ -461,4 +516,15 @@ nav button:hover, nav button:focus-visible { color: #ffef8c; background: #173f69
   .archive-signature { margin: 0 10px; }
   .return-thread-bar { align-items: flex-start; }
   .return-thread-bar span { max-width: 45%; text-align: right; }
+  .ghost-system-line { align-items: flex-start; gap: 8px; }
+  .manifest-floor .archive-floor-body { min-height: 72px; }
+  .post-editor-title { align-items: flex-start; gap: 8px; }
+  #possessionPostForm { padding: 14px 10px 16px; }
+  .editor-title-label span { display: block; margin: 0 0 5px 43px; }
+  .editor-title-label input { width: calc(100% - 43px); margin-left: 43px; min-height: 40px; }
+  .editor-instruction, .editor-actions, .compose-warning { margin-left: 0; }
+  .editor-body-label textarea { height: 310px; font-size: 13px; }
+  .editor-actions button { min-height: 42px; }
+  .blackout-message { width: calc(100% - 26px); }
+  .blackout-message h1 { margin-bottom: 34px; font-size: 28px; letter-spacing: .06em; }
 }

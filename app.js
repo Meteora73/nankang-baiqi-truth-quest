@@ -17,12 +17,27 @@ const threadPagers = [document.querySelector("#threadPagerTop"), document.queryS
 const threadOwnerPost = document.querySelector("#threadOwnerPost");
 const floorJumpForm = document.querySelector("#floorJumpForm");
 const floorJumpInput = document.querySelector("#floorJumpInput");
+const ghostReplies = document.querySelector("#ghostReplies");
+const ghostThreadStats = document.querySelector("#ghostThreadStats");
+const ghostSystemText = document.querySelector("#ghostSystemText");
+const ghostContinue = document.querySelector("#ghostContinue");
+const continueRecoveryButton = document.querySelector("#continueRecoveryButton");
+const soundToggle = document.querySelector("#soundToggle");
+const possessionPostForm = document.querySelector("#possessionPostForm");
+const possessionTitleInput = document.querySelector("#possessionTitleInput");
+const possessionBody = document.querySelector("#possessionBody");
+const publishPossessionButton = document.querySelector("#publishPossessionButton");
+const composeReturnButton = document.querySelector("#composeReturnButton");
+const composeWarning = document.querySelector("#composeWarning");
+const composeAuthor = document.querySelector("#composeAuthor");
+const composeStatus = document.querySelector("#composeStatus");
+const blackoutEnding = document.querySelector("#blackoutEnding");
 const diaryArchive = window.DIARY_ARCHIVE || {};
 const threadSource = window.THREAD_SOURCE || { ownerPost: "", replies: [] };
 const sourceReplies = new Map((threadSource.replies || []).map(reply => [Number(reply.floor), reply]));
 const threadPageSize = 200;
 const threadPageCount = 3;
-const storageKey = "yuanan-forum-mystery-v4";
+const storageKey = "yuanan-forum-mystery-v5";
 
 const tickers = {
   0: "旧版社区仅供浏览，部分帖子及用户资料可能无法访问。",
@@ -34,9 +49,32 @@ const tickers = {
   6: "正在访问站外网页：年轮网络日记本。",
   7: "正在访问站外网页：2015 年匿名调查楼。",
   8: "用户中心：密保验证中。您可以返回原帖继续查找链接。",
-  9: "账号恢复完成。新的登录记录已经写入。",
-  10: "远岸社区主题浏览：帖子内容来自旧版镜像。"
+  9: "正在恢复缺失回复。请勿关闭当前页面。",
+  10: "远岸社区主题浏览：帖子内容来自旧版镜像。",
+  11: "账号恢复尚未完成。请验证主题发表权限。",
+  12: "主题发表成功。当前登录用户：南康白起。"
 };
+
+const ghostPosts = [
+  { floor: 438, user: "该用户已注销", time: "2008-03-09 03:35:00", html: "谁告诉你们我死了？" },
+  { floor: 439, user: "南康好友", current: true, html: "这不是我发的。" },
+  { floor: 440, user: "该用户已注销", current: true, html: "当然不是你发的。<br><br>你只回答了七个问题。<br>是你把我放进来的。" },
+  { floor: 441, user: "该用户已注销", current: true, html: "第一个问题，你说你只是听过我的名字。<br>第二个问题，你算出了十八天。<br>第五个问题，你打开了《那个人》。<br><br>你真的觉得那些问题是在验证你吗？" },
+  { floor: 442, user: "该用户已注销", current: true, html: "他们说我死了，我就有了死亡。<br>他们说我爱过，我就有了爱人。<br>他们替我写了那么多过去。<br><br>可我从来没有一个可以留在现在的人。" },
+  { floor: 443, user: "我帅故我在吗", current: true, html: "我没有写过这篇悼文。" }
+];
+
+const possessionBodyText = `如果没有那七个答案，我想我不会去关注这样一个人。
+
+他翻完了三页旧帖，打开了所有已经失效的页面。他一次次告诉系统，自己只是一名与这件事无关的网友。
+
+可是，他知道得太多了。
+
+知道一个人所有的过去，与成为那个人，究竟有什么区别？
+
+今天，看到系统的信息，有几分感慨，以此文字祭祀。
+
+祝他一路走好。`;
 
 const threadStoryReplies = {
   205: { user: "无名氏", time: "2015-05-27 23:44", link: true, html: "这里有人把学校名单、344 条新闻目录、旧帖转载和账号登录记录放在一楼里追查，楼数很长：<button class=\"external-link\" type=\"button\" data-goto=\"7\">[站外链接] 2015 年匿名调查楼</button>" },
@@ -93,21 +131,36 @@ const ordinaryThreads = {
 let state = loadState();
 let diaryReturnFocus = null;
 let deadReturnFocus = null;
+let endingTimers = [];
+let bodyTypingTimer = null;
+let audioContext = null;
+let endingMuted = false;
 history.scrollRestoration = "manual";
 
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey));
+    const recoveryStep = Math.max(0, Math.min(7, Number(saved?.recoveryStep) || 0));
+    const endingPhase = ["none", "manifesting", "compose", "published"].includes(saved?.endingPhase)
+      ? saved.endingPhase
+      : recoveryStep >= 7 ? "manifesting" : "none";
     return {
       storyStarted: Boolean(saved?.storyStarted),
-      recoveryStep: Math.max(0, Math.min(7, Number(saved?.recoveryStep) || 0)),
+      recoveryStep,
       threadPage: Math.max(1, Math.min(threadPageCount, Number(saved?.threadPage) || 1)),
       threadMode: "all",
-      ordinaryTitle: typeof saved?.ordinaryTitle === "string" ? saved.ordinaryTitle : "十年前的网吧，现在还有人记得吗"
+      ordinaryTitle: typeof saved?.ordinaryTitle === "string" ? saved.ordinaryTitle : "十年前的网吧，现在还有人记得吗",
+      endingPhase,
+      composeReturnAttempts: Math.max(0, Number(saved?.composeReturnAttempts) || 0),
+      publishedAt: typeof saved?.publishedAt === "string" ? saved.publishedAt : ""
     };
   } catch {
-    return { storyStarted: false, recoveryStep: 0, threadPage: 1, threadMode: "all", ordinaryTitle: "十年前的网吧，现在还有人记得吗" };
+    return freshState();
   }
+}
+
+function freshState() {
+  return { storyStarted: false, recoveryStep: 0, threadPage: 1, threadMode: "all", ordinaryTitle: "十年前的网吧，现在还有人记得吗", endingPhase: "none", composeReturnAttempts: 0, publishedAt: "" };
 }
 
 function saveState() {
@@ -120,6 +173,54 @@ function pad(value) {
 
 function stamp(date = new Date()) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
+function clearEndingTimers() {
+  endingTimers.forEach(timer => window.clearTimeout(timer));
+  endingTimers = [];
+  if (bodyTypingTimer) window.clearInterval(bodyTypingTimer);
+  bodyTypingTimer = null;
+}
+
+function later(callback, delay) {
+  const timer = window.setTimeout(callback, delay);
+  endingTimers.push(timer);
+  return timer;
+}
+
+function prepareEndingAudio() {
+  if (endingMuted) return;
+  try {
+    audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+    audioContext.resume();
+  } catch {
+    endingMuted = true;
+  }
+}
+
+function playTone(frequency = 220, duration = 0.09, volume = 0.025, delay = 0) {
+  if (endingMuted || !audioContext) return;
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  const start = audioContext.currentTime + delay;
+  oscillator.type = "sine";
+  oscillator.frequency.setValueAtTime(frequency, start);
+  gain.gain.setValueAtTime(0.0001, start);
+  gain.gain.exponentialRampToValueAtTime(volume, start + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+  oscillator.connect(gain).connect(audioContext.destination);
+  oscillator.start(start);
+  oscillator.stop(start + duration + 0.02);
+}
+
+function playReplySound(index) {
+  playTone(index < 2 ? 740 : 120 + index * 17, index < 2 ? 0.08 : 0.16, index < 2 ? 0.025 : 0.018);
+}
+
+function playBlackoutSound() {
+  playTone(150, 1.7, 0.035);
+  playTone(103, 2.1, 0.03, 0.08);
+  playTone(62, 2.5, 0.025, 0.16);
 }
 
 function escapeHtml(value) {
@@ -248,14 +349,132 @@ function renderOrdinaryThread() {
   document.querySelector("#ordinaryReplies").innerHTML = samples.map(reply => `<div class="floor"><span><b>${reply.floor}#</b>　${escapeHtml(reply.user)}</span><p>${escapeHtml(reply.text)}</p></div>`).join("");
 }
 
+function ghostFloorHtml(post) {
+  const postTime = post.current ? stamp() : post.time;
+  return `<article class="archive-floor manifest-floor" data-ghost-floor="${post.floor}">
+    <header class="archive-floor-head">
+      <span>作者：<b>${escapeHtml(post.user)}</b></span><span>时间：${escapeHtml(postTime)}</span>
+      <span class="archive-floor-actions">回复　举报　${post.floor}楼</span>
+    </header>
+    <div class="archive-floor-body">${post.html}</div>
+  </article>`;
+}
+
+function startGhostSequence() {
+  clearEndingTimers();
+  ghostReplies.innerHTML = "";
+  ghostThreadStats.textContent = "点击：32330　回复：437　共 3 页";
+  ghostSystemText.textContent = "正在恢复缺失回复……";
+  ghostContinue.hidden = true;
+  document.body.classList.add("ghost-mode");
+  document.querySelector("#navUserButton").textContent = "用户中心";
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const spacing = reducedMotion ? 80 : 1450;
+
+  ghostPosts.forEach((post, index) => {
+    later(() => {
+      ghostReplies.insertAdjacentHTML("beforeend", ghostFloorHtml(post));
+      ghostThreadStats.textContent = `点击：32330　回复：${post.floor}　共 4 页`;
+      ghostSystemText.textContent = index === 0 ? "已找到 1 条不属于当前快照的回复。" : `仍在写入…… ${post.floor} / 437`;
+      playReplySound(index);
+      if (index === 1) document.querySelector("#navUserButton").textContent = "南康好友";
+      if (index === 3) {
+        document.querySelector("#navUserButton").textContent = "南康白起";
+        document.body.classList.add("identity-slip");
+      }
+      ghostReplies.lastElementChild?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "end" });
+    }, (index + 1) * spacing);
+  });
+
+  later(() => {
+    ghostSystemText.textContent = "恢复进度：99%　需要验证主题发表权限。";
+    ghostContinue.hidden = false;
+    ghostContinue.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" });
+    continueRecoveryButton.focus({ preventScroll: true });
+  }, (ghostPosts.length + 1) * spacing);
+}
+
+function composeWarningText() {
+  if (state.composeReturnAttempts === 1) return "你还没有写完。";
+  if (state.composeReturnAttempts === 2) return "悼念帖必须由活着的人发表。";
+  if (state.composeReturnAttempts >= 3) return "现在只有我是活着的人。";
+  return "";
+}
+
+function updatePublishAvailability() {
+  publishPossessionButton.disabled = possessionTitleInput.value.trim() !== "一路走好" || possessionBody.value !== possessionBodyText;
+}
+
+function renderCompose() {
+  clearEndingTimers();
+  document.body.classList.add("ghost-mode");
+  composeWarning.textContent = composeWarningText();
+  composeAuthor.textContent = possessionTitleInput.value ? "南康白起" : "南康好友";
+  composeStatus.textContent = possessionTitleInput.value ? "在线" : "身份核对中";
+  if (!possessionTitleInput.value) possessionBody.value = "";
+  updatePublishAvailability();
+  later(() => possessionTitleInput.focus({ preventScroll: true }), 80);
+}
+
+function startBodyTyping() {
+  if (bodyTypingTimer || possessionBody.value === possessionBodyText) return;
+  let position = possessionBody.value.length;
+  bodyTypingTimer = window.setInterval(() => {
+    position += 1;
+    possessionBody.value = possessionBodyText.slice(0, position);
+    possessionBody.scrollTop = possessionBody.scrollHeight;
+    if (position >= possessionBodyText.length) {
+      window.clearInterval(bodyTypingTimer);
+      bodyTypingTimer = null;
+      updatePublishAvailability();
+    }
+  }, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 1 : 18);
+}
+
+function renderPublishedEnding() {
+  clearEndingTimers();
+  document.body.classList.add("ghost-mode", "identity-slip", "published-mode");
+  document.querySelector("#navUserButton").textContent = "南康白起";
+  document.querySelector("#publishedTime").textContent = state.publishedAt || stamp();
+  document.querySelectorAll(".reply-now").forEach((element, index) => {
+    const date = new Date(Date.now() + (index + 1) * 1000);
+    element.textContent = stamp(date);
+  });
+  document.querySelector("#publishedBody").innerHTML = textToHtml(possessionBodyText);
+  document.querySelectorAll(".possession-reply").forEach(element => element.classList.remove("revealed"));
+  blackoutEnding.classList.remove("active", "message-visible");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const replyOneDelay = reducedMotion ? 100 : 1200;
+  const replyTwoDelay = reducedMotion ? 200 : 2600;
+  const blackoutDelay = reducedMotion ? 350 : 5600;
+  later(() => document.querySelector(".possession-reply")?.classList.add("revealed"), replyOneDelay);
+  later(() => {
+    document.querySelector(".second-reply")?.classList.add("revealed");
+    playReplySound(1);
+  }, replyTwoDelay);
+  later(() => {
+    blackoutEnding.classList.add("active");
+    playBlackoutSound();
+    later(() => blackoutEnding.classList.add("message-visible"), reducedMotion ? 50 : 850);
+  }, blackoutDelay);
+}
+
 function pageFromHash() {
   const match = location.hash.match(/^#page-(\d+)$/);
   return match ? Number(match[1]) : 0;
 }
 
 function showPage(requestedPage, addHistory = true) {
-  let next = Math.max(0, Math.min(10, Number(requestedPage) || 0));
-  if (next === 8 && state.recoveryStep >= 7) next = 9;
+  let next = Math.max(0, Math.min(12, Number(requestedPage) || 0));
+  if (next === 8 && state.recoveryStep >= 7) {
+    next = state.endingPhase === "published" ? 12 : state.endingPhase === "compose" ? 11 : 9;
+  }
+  if (next === 9 && state.endingPhase === "compose") next = 11;
+  if (next === 9 && state.endingPhase === "published") next = 12;
+  if ([9, 11, 12].includes(next) && state.recoveryStep < 7) next = 0;
+  if (next === 11 && state.endingPhase === "manifesting") next = 9;
+  if (next === 11 && state.endingPhase === "published") next = 12;
+  if (next === 12 && state.endingPhase !== "published") next = state.endingPhase === "compose" ? 11 : 9;
   if (next === 1) renderMainThread();
   if (next === 10) renderOrdinaryThread();
 
@@ -269,25 +488,37 @@ function showPage(requestedPage, addHistory = true) {
   else if (next === 1) pageCounter.textContent = `主题回复：第 ${state.threadPage} / ${threadPageCount} 页`;
   else if (next >= 2 && next <= 7) pageCounter.textContent = "站外链接页面";
   else if (next === 8) pageCounter.textContent = `账号恢复：密保 ${state.recoveryStep + 1} / 7`;
-  else if (next === 9) pageCounter.textContent = "账号恢复完成";
+  else if (next === 9) pageCounter.textContent = "主题回复：第 4 页";
+  else if (next === 11) pageCounter.textContent = "发表新主题";
+  else if (next === 12) pageCounter.textContent = "主题发表成功";
   else pageCounter.textContent = "社区主题浏览";
 
-  tickerText.textContent = tickers[next];
+  tickerText.textContent = tickers[next] || tickers[0];
   document.title = next === 0
     ? "远岸社区旧版镜像 - 在远处，也在一起"
     : next === 8
       ? "找回账号 - 远岸用户中心"
       : next === 9
-        ? "该用户已注销 - ERROR 035"
+        ? "第 4 页 - 长沙的南康，一路走好"
         : next === 10
           ? `${state.ordinaryTitle} - 远岸社区`
+          : next === 11
+            ? "发表新主题 - 一路同行"
+            : next === 12
+              ? "主题发表成功 - 远岸社区"
           : `${document.querySelector(`#page-${next} h1, #page-${next} [id^="title-"]`)?.textContent?.trim() || "旧帖"} - 旧页镜像`;
 
   if (addHistory) history.pushState({ page: next }, "", `#page-${next}`);
   window.scrollTo({ top: 0, behavior: "auto" });
   document.querySelector(`#page-${next} h1, #page-${next} h2, #page-${next} button`)?.focus({ preventScroll: true });
   if (next === 8) renderRecovery();
-  if (next === 9) document.querySelector("#endingTime").textContent = stamp();
+  if (next === 9) startGhostSequence();
+  else if (next === 11) renderCompose();
+  else if (next === 12) renderPublishedEnding();
+  else if (next !== 9) {
+    clearEndingTimers();
+    document.body.classList.remove("ghost-mode", "identity-slip", "published-mode");
+  }
 }
 
 function beginStory() {
@@ -343,6 +574,10 @@ function submitRecovery(form) {
   }
   feedback.className = "recovery-feedback ok";
   feedback.textContent = "答案匹配，正在载入下一项……";
+  if (index === recoveryForms.length - 1) {
+    prepareEndingAudio();
+    state.endingPhase = "manifesting";
+  }
   state.recoveryStep += 1;
   saveState();
   window.setTimeout(() => {
@@ -352,6 +587,32 @@ function submitRecovery(form) {
 }
 
 document.addEventListener("click", event => {
+  if (event.target === continueRecoveryButton) {
+    state.endingPhase = "compose";
+    saveState();
+    showPage(11);
+    return;
+  }
+  if (event.target === soundToggle) {
+    endingMuted = !endingMuted;
+    soundToggle.textContent = endingMuted ? "声音：关" : "声音：开";
+    if (endingMuted) audioContext?.suspend();
+    else {
+      prepareEndingAudio();
+      audioContext?.resume();
+      playTone(620, 0.08, 0.02);
+    }
+    return;
+  }
+  if (event.target === composeReturnButton) {
+    state.composeReturnAttempts += 1;
+    saveState();
+    composeWarning.textContent = composeWarningText();
+    composeWarning.classList.remove("warning-flash");
+    requestAnimationFrame(() => composeWarning.classList.add("warning-flash"));
+    possessionTitleInput.focus();
+    return;
+  }
   const diaryLink = event.target.closest("[data-diary]");
   if (diaryLink) {
     openDiary(diaryLink.dataset.diary, diaryLink);
@@ -394,6 +655,16 @@ document.addEventListener("click", event => {
 });
 
 document.addEventListener("submit", event => {
+  if (event.target === possessionPostForm) {
+    event.preventDefault();
+    if (possessionTitleInput.value.trim() !== "一路走好" || possessionBody.value !== possessionBodyText) return;
+    prepareEndingAudio();
+    state.endingPhase = "published";
+    state.publishedAt = stamp();
+    saveState();
+    showPage(12);
+    return;
+  }
   if (event.target === floorJumpForm) {
     event.preventDefault();
     const floor = Math.max(1, Math.min(437, Number(floorJumpInput.value) || 1));
@@ -407,6 +678,18 @@ document.addEventListener("submit", event => {
   if (!form) return;
   event.preventDefault();
   submitRecovery(form);
+});
+
+possessionTitleInput.addEventListener("input", () => {
+  const hasInput = Boolean(possessionTitleInput.value);
+  composeAuthor.textContent = hasInput ? "南康白起" : "南康好友";
+  composeStatus.textContent = hasInput ? "在线" : "身份核对中";
+  updatePublishAvailability();
+  document.body.classList.toggle("identity-slip", hasInput);
+  if (hasInput) {
+    startBodyTyping();
+    playTone(90, 0.13, 0.015);
+  }
 });
 
 document.querySelector("#closeDiaryTop").addEventListener("click", closeDiary);
@@ -423,8 +706,17 @@ document.addEventListener("keydown", event => {
 });
 
 document.querySelector("#restartButton").addEventListener("click", () => {
-  state = { storyStarted: false, recoveryStep: 0, threadPage: 1, threadMode: "all", ordinaryTitle: "十年前的网吧，现在还有人记得吗" };
+  clearEndingTimers();
+  state = freshState();
   saveState();
+  possessionTitleInput.value = "";
+  possessionBody.value = "";
+  composeWarning.textContent = "";
+  publishPossessionButton.disabled = true;
+  blackoutEnding.classList.remove("active", "message-visible");
+  document.querySelector("#navUserButton").textContent = "用户中心";
+  document.querySelector("#homeLoginStatus").textContent = "您尚未登录";
+  document.body.classList.remove("ghost-mode", "identity-slip", "published-mode");
   recoveryForms.forEach(form => {
     form.reset();
     form.querySelector(".recovery-feedback").textContent = "";
@@ -438,7 +730,7 @@ window.addEventListener("popstate", event => {
 });
 
 const initialPage = pageFromHash();
-if (initialPage >= 1 && initialPage <= 9) {
+if (initialPage >= 1 && initialPage <= 12 && initialPage !== 10) {
   state.storyStarted = true;
   saveState();
 }
