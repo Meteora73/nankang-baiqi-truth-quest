@@ -14,7 +14,7 @@
   <meta property="og:image" content="og.png?v=20260830-3">
   <title>远岸社区旧版镜像 - 在远处，也在一起</title>
   <link rel="icon" href="favicon.svg?v=20260830-3" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=20260905-1">
+  <link rel="stylesheet" href="styles.css?v=20260905-2">
 </head>
 <body>
   <div class="fiction-line">※ 剧情为虚构。</div>
@@ -66,7 +66,7 @@
           </div>
 
           <aside class="portal-right">
-            <section class="old-panel side-login"><div class="panel-title">用户中心</div><p id="homeLoginStatus">您尚未登录</p><button type="button" data-recovery>找回账号 / 密码</button><p class="muted">注册新用户　｜　帮助中心</p></section>
+            <section class="old-panel side-login"><div class="panel-title">用户中心</div><p id="homeLoginStatus">您尚未登录</p><button type="button" id="homeEcho" data-recovery hidden></button><button type="button" data-recovery>找回账号 / 密码</button><p class="muted">注册新用户　｜　帮助中心</p></section>
             <section class="old-panel compact-list"><div class="panel-title">社区公告</div><button data-dead-title="旧版社区镜像使用说明">旧版社区镜像使用说明</button><button data-dead-title="关于部分历史数据缺失的公告">关于部分历史数据缺失的公告</button><button data-dead-title="用户昵称清理通知">用户昵称清理通知</button></section>
             <section class="old-panel compact-list"><div class="panel-title">热门推荐</div><button data-forum-thread="2008，那些留在论坛里的人">2008，那些留在论坛里的人</button><button data-forum-thread="旧贴寻人：你还记得他吗">旧贴寻人：你还记得他吗</button><button data-forum-thread="十大最感人的网络文字">十大最感人的网络文字</button></section>
             <div class="counter">您是第 <b id="visitCount">000035</b> 位访客<br><small>今日：3512　昨日：10427</small></div>
@@ -289,6 +289,7 @@
           <div class="recovery-main">
             <div class="recovery-title"><b id="title-8">通过密保问题恢复账号</b><span>步骤 <strong id="recoveryStepNumber">1</strong> / 7</span></div>
             <div class="account-target"><span>正在恢复：</span><b>南康好友</b><small>该账号最后登录记录异常，请回答全部密保问题。</small></div>
+            <p id="recoveryIdentityNote" class="access-receipt"></p><div id="recoveryReceipt" class="recovery-receipt" hidden></div>
             <div class="recovery-progress" aria-label="账号恢复进度"><i id="recoveryProgressBar"></i></div>
 
             <form class="recovery-question active" data-recovery-form data-key="relation" data-answer="reader">
@@ -362,15 +363,15 @@
       <section class="screen" id="page-9" data-page="9" aria-labelledby="title-9">
         <div class="crumb">论坛首页 &gt; 一路同行 &gt; 左岸文字</div>
         <div class="forum-head ghost-forum-head"><b id="title-9">[左岸文字] 长沙的南康，一路走好</b><span id="ghostThreadStats">点击：32330　回复：437　共 3 页</span></div>
-        <div class="ghost-system-line"><span id="ghostSystemText">正在恢复缺失回复……</span><button type="button" class="sound-toggle" id="soundToggle">声音：开</button></div>
+        <div class="ghost-system-line"><span id="ghostSystemText">正在恢复缺失回复……</span></div>
         <article class="archive-floor ghost-seed-floor">
           <header class="archive-floor-head"><span>作者：<b>南康好友</b></span><span>时间：2015-05-29 03:35</span><span class="archive-floor-actions">回复　举报　437楼</span></header>
-          <div class="archive-floor-body">你已经打开了所有被转贴过的页面。还要继续登录吗？</div>
+          <div class="archive-floor-body">所有链接都回到这里。还要继续登录吗？</div>
         </article>
         <div id="ghostReplies" class="ghost-replies" aria-live="polite"></div>
         <div class="ghost-continue" id="ghostContinue" hidden>
           <p>账号恢复尚未完成。</p>
-          <button class="old-button" type="button" id="continueRecoveryButton">继续账号恢复</button>
+          <button class="old-button" type="button" id="continueRecoveryButton">处理恢复申请</button>
         </div>
       </section>
 
@@ -403,6 +404,7 @@
             <label class="editor-body-label">正文：<textarea id="possessionBody" readonly aria-label="帖子正文"></textarea></label>
             <div class="editor-actions">
               <button class="old-button" type="button" id="composeReturnButton">返回原帖</button>
+              <button class="old-button" type="button" data-withdraw>撤回恢复申请</button>
               <button class="old-button publish-button" type="submit" id="publishPossessionButton" disabled>发 表</button>
             </div>
             <p class="compose-warning" id="composeWarning" aria-live="polite"></p>
@@ -412,7 +414,7 @@
 
       <section class="screen" id="page-12" data-page="12" aria-labelledby="title-12">
         <div class="crumb">论坛首页 &gt; 一路同行 &gt; 主题发表成功</div>
-        <div class="publish-success">主题发表成功。页面将在 5 秒后返回。</div>
+        <div class="publish-success">主题发表成功。正在等待回复。</div>
         <div class="forum-head"><b>一路同行</b><span>点击：1　回复：2</span></div>
         <article class="archive-post possession-post">
           <header class="archive-floor-head"><span>作者：<b>南康白起</b></span><span>时间：<span id="publishedTime"></span></span><span class="archive-floor-actions">回复　举报　楼主</span></header>
@@ -420,27 +422,57 @@
           <div class="archive-floor-body" id="publishedBody"></div>
         </article>
         <article class="archive-floor possession-reply">
-          <header class="archive-floor-head"><span>作者：<b>相看只有山如故</b></span><span>时间：<span class="reply-now"></span></span><span class="archive-floor-actions">回复　举报　1楼</span></header>
+          <header class="archive-floor-head"><span>作者：<b>窗外无声</b></span><span>时间：<span class="reply-now"></span></span><span class="archive-floor-actions">回复　举报　1楼</span></header>
           <div class="archive-floor-body">只是从文字中认识他。<br>愿他一路走好。</div>
         </article>
         <article class="archive-floor possession-reply second-reply">
-          <header class="archive-floor-head"><span>作者：<b>一直岸锋</b></span><span>时间：<span class="reply-now"></span></span><span class="archive-floor-actions">回复　举报　2楼</span></header>
+          <header class="archive-floor-head"><span>作者：<b>末页来客</b></span><span>时间：<span class="reply-now"></span></span><span class="archive-floor-actions">回复　举报　2楼</span></header>
           <div class="archive-floor-body">不是真的吧？<br>他刚才还在线。</div>
         </article>
-        <div class="blackout-ending" id="blackoutEnding" aria-live="assertive">
+        <div class="blackout-ending" id="blackoutEnding" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="身份转移完成">
           <div class="blackout-noise"></div>
           <div class="blackout-message">
             <h1>你不该知道我不存在。</h1>
-            <p>身份转移完成。</p>
+            <p>身份转移完成。结局五 · 替他留下。</p>
             <div>南康白起：<b>在线</b><br>第444位访问者：该用户已注销</div>
+            <button type="button" data-mute>声音：开</button>
+            <button type="button" data-replay-branch>重选最后的处理方式</button>
             <button type="button" id="restartButton">重新开始</button>
           </div>
+        </div>
+      </section>
+      <section class="screen" id="page-13" data-page="13" aria-labelledby="title-13">
+        <div class="crumb">用户中心 &gt; 账号恢复 &gt; 冲突处理</div>
+        <div class="recovery-review">
+          <div class="panel-title" id="title-13">同一个账号，不能恢复成两个人</div>
+          <p>你答出的七项资料都能在网页里找到。任何人都可以答对。<br>系统却把这些答案当成了你的过去。</p>
+          <pre id="branchReceipt" class="receipt-text"></pre>
+          <fieldset><legend>这些记录说明了什么？</legend>
+            <label><input type="radio" name="verdict" value="later"> 后来的人反复登录，记录不属于原主人。</label>
+            <label><input type="radio" name="verdict" value="alive"> 原主人仍在这里。他没有离开这个账号。</label>
+            <label><input type="radio" name="verdict" value="empty"> 没有原主人。大家在替同一个空缺填写人生。</label>
+          </fieldset>
+          <p class="review-whisper">附言：如果你不愿意成为我，就别替我证明我是谁。</p>
+          <div class="branch-actions">
+            <button class="old-button" type="button" id="branchPreserve" data-branch-action="preserve">保留记录，结束调查</button>
+            <button class="old-button" type="button" id="branchContact" data-branch-action="contact">清除没有持有人的身份</button>
+            <button class="old-button" type="button" data-branch-action="restore">这些答案也是我的。继续恢复</button>
+          </div>
+        </div>
+      </section>
+      <section class="screen" id="page-14" data-page="14" aria-labelledby="branchEndingTitle">
+        <div class="crumb">用户中心 &gt; 申请记录 &gt; 444</div>
+        <div class="branch-ending-window">
+          <div class="panel-title" id="branchEndingTitle"></div>
+          <div id="branchEndingContent" aria-live="polite"></div>
+          <button class="old-button" type="button" id="endingNext" data-ending-next>继续阅读</button>
+          <div id="endingResolved" hidden><p id="endingLabel"></p><button class="old-button" type="button" data-goto="0">返回社区</button> <button class="old-button" type="button" data-replay-branch>重选最后的处理方式</button></div>
         </div>
       </section>
     </main>
 
     <div class="page-status">
-      <span id="pageCounter">专题首页</span>
+      <span id="pageCounter">专题首页</span><button type="button" class="sound-toggle" id="soundToggle" hidden>声音：开</button>
       <span>最佳浏览：1024×768　IE6.0 以上</span>
     </div>
     <footer>
@@ -475,8 +507,8 @@
     </div>
   </div>
 
-  <script src="thread-source-data.js?v=20260905-1"></script>
-  <script src="diary-data.js?v=20260905-1"></script>
-  <script src="app.js?v=20260905-1"></script>
+  <script src="thread-source-data.js?v=20260905-2"></script>
+  <script src="diary-data.js?v=20260905-2"></script>
+  <script src="app.js?v=20260905-2"></script>
 </body>
 </html>

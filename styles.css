@@ -528,3 +528,46 @@ body.identity-slip .post-editor-account strong { color: #7a1717; }
   .blackout-message { width: calc(100% - 26px); }
   .blackout-message h1 { margin-bottom: 34px; font-size: 28px; letter-spacing: .06em; }
 }
+
+/* Recovery receipts and quiet, reader-paced endings. */
+[hidden] { display: none !important; }
+.access-receipt { font: 12px/1.8 SimSun, serif; color: #777; border-top: 1px dotted #aaa; padding-top: 8px; }
+.access-receipt:empty { display: none; }
+.recovery-receipt, .recovery-review, .branch-ending-window { margin: 20px auto; padding: 20px; max-width: 780px; background: #f6f5ed; border: 1px solid #999; color: #343430; }
+.recovery-receipt h2 { font: bold 17px/1.7 SimSun, serif; }
+.receipt-text { white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/2 SimSun, serif; padding: 16px; background: #eeeee6; border: 1px inset #ccc; }
+.receipt-choices, .branch-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+.recovery-review p { line-height: 2; }
+.recovery-review fieldset { margin-top: 24px; border: 1px solid #aaa; }
+.recovery-review label { display: block; padding: 14px 8px; line-height: 1.8; cursor: pointer; }
+.review-whisper { color: #755e5e; font-family: SimSun, serif; }
+.ending-letter { margin: 20px 0 32px; border-bottom: 1px dotted #aaa; }
+.ending-letter header { font: 12px/2 SimSun, serif; color: #777; }
+.ending-letter p { line-height: 2.2; white-space: normal; font-size: 16px; }
+.ending-faded .ending-letter:last-child { color: #532b2b; }
+#endingLabel { border-top: 1px solid #aaa; padding-top: 20px; color: #666; }
+.uneasy-mode .ticker { background: #e7e6de; }
+#homeEcho { margin: 10px 0; line-height: 1.8; text-align: left; }
+.branch-actions .old-button, .receipt-choices .old-button { white-space: normal; min-height: 42px; }
+.blackout-message button { margin: 12px 6px; }
+@media (max-width: 600px) {
+  .recovery-receipt, .recovery-review, .branch-ending-window { margin: 10px 0; padding: 12px; }
+  .branch-actions, .receipt-choices { flex-direction: column; }
+  .branch-actions button, .receipt-choices button { width: 100%; text-align: left; }
+  .receipt-text { padding: 10px; font-size: 13px; }
+  .editor-actions { flex-wrap: wrap; gap: 10px; }
+}
+
+/* Fade slowly; no flashing or jump image. */
+.blackout-ending { transition: opacity 2.5s ease; }
+.blackout-message { transform: none; transition: opacity 2s ease; }
+.blackout-noise { animation: none; opacity: .025; }
+.blackout-message button { color: #aaa; border-color: #666; }
+.warning-flash { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+.screen.active { animation: none; }
+.manifest-floor, .possession-reply.revealed { animation: quietReply .7s ease; }
+@keyframes quietReply { from { opacity: 0; } to { opacity: 1; } }
