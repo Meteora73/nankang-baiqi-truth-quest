@@ -160,7 +160,53 @@ const branchStories = {
     ["已离开社区", "你关掉了草稿，没有发表新的悼文。\n\n系统只保留了一条离线签名：\n“我没有进去。请不要把我算在里面。”\n\n在线人数没有减少。"] ], actions: ["查看未发送草稿", "查看草稿历史", "关闭草稿"] }
 };
 
+const endingNames = { archive: "留档", waiting: "他还活着", erased: "查无此人", refusal: "留在门外", possession: "替他留下" };
+const branchTasks = {
+  archive: { title: "归档前比对", body: "原账号的持有人一栏是空白。归档副本却建议填入：第444位访问者。", options: [["leave", "保留空白，封存副本"], ["sign", "用我的身份补齐副本"]] },
+  waiting: { title: "回复站内信", body: "对方：我们只能留一个会话。你愿意把现在让给我吗？", options: [["stay", "我还在这里。不要替我退出。"], ["yield", "好。这次我先走。"]] },
+  erased: { title: "身份申诉", body: "请填写一项只属于本次访问者的记录。系统已经有你的陈述，不接受重复提交。\n\n你现在能提供的，是申请编号。", input: true },
+  refusal: { title: "离开前处理草稿", body: "收件人：第445位访问者。\n正文：不要回答最后一个问题。它问的不是谁死了。\n\n这封信每次都停在发出之前。", options: [["unsent", "保留为草稿，离开"], ["send", "把提醒留给下一位访客"]] }
+};
+
+function recordEnding(key) {
+  if (!endingNames[key]) return;
+  const action = key === "possession" ? "publish" : state.branchAction || "legacy";
+  const previous = state.completed[key];
+  if (previous?.action === action && JSON.stringify(previous.decisions) === JSON.stringify(state.decisions)) return;
+  state.completed[key] = { time: stamp(), decisions: { ...state.decisions }, action };
+  saveState();
+  document.querySelectorAll("[data-collection]").forEach(button => { button.hidden = false; });
+}
+
+function renderCollection() {
+  clearEndingTimers();
+  document.body.classList.remove("ghost-mode", "identity-slip", "published-mode");
+  document.querySelector("#collectionCount").textContent = `${Object.keys(state.completed).length} / 5`;
+  document.querySelector("#collectionList").innerHTML = Object.entries(endingNames).map(([key, name], index) => {
+    const item = state.completed[key];
+    return `<article class="ending-letter"><header>回执 ${index + 1} / ${item ? escapeHtml(item.time) : "尚未归档"}</header><h2>${item ? escapeHtml(name) : "未读取的回执"}</h2>${item ? `<p>${checkpoints.map(cp => escapeHtml(cp.options.find(([value]) => value === item.decisions?.[cp.key])?.[1] || "旧申请未记录")).join("<br>")}</p><p>最近处理：${escapeHtml(({ leave: "保留空白", stay: "保持自己的会话", claim: "提交本次申请编号", unsent: "保留草稿", send: "给下一位留信", publish: "发表悼念帖" })[item.action] || "会话已结束")}</p>` : "<p>这份回执尚未写上你的名字。</p>"}</article>`;
+  }).join("");
+  document.querySelector("#collectionReplay").hidden = state.recoveryStep < 7;
+  pageCounter.textContent = "用户中心 / 已归档回执";
+  tickerText.textContent = "这里保存的是你已经读完的结局。";
+}
+
+function finishBranch(action) {
+  if (state.endingPhase !== "resolved" || state.endingBeat !== 2) return;
+  const task = branchTasks[state.ending];
+  if (!task || !(task.input ? action === "claim" : task.options.some(([value]) => value === action))) return;
+  if (action === "sign" || action === "yield") {
+    state.branchAction = action;
+    state.endingPhase = "compose";
+    state.composeTitle = ""; state.composePosition = 0;
+    saveState(); showPage(11); return;
+  }
+  state.branchAction = action; state.endingBeat = 3;
+  recordEnding(state.ending); saveState(); renderBranchEnding();
+}
+
 function renderAtmosphere(page) {
+  document.querySelectorAll("[data-collection]").forEach(button => { button.hidden = Object.keys(state.completed).length === 0; });
   const active = state.storyStarted && state.recoveryStep >= 2;
   document.querySelector("#visitCount").textContent = active ? "000444" : "000035";
   soundToggle.hidden = state.recoveryStep < 7;
@@ -205,7 +251,7 @@ function chooseBranch(action) {
 
 function resolveEnding(ending) {
   if (state.recoveryStep < 7 || !branchStories[ending]) return;
-  state.endingPhase = "resolved"; state.ending = ending; state.endingBeat = 0;
+  state.endingPhase = "resolved"; state.ending = ending; state.endingBeat = 0; state.branchAction = "";
   saveState(); showPage(14);
 }
 
@@ -219,8 +265,17 @@ function renderBranchEnding() {
   const steps = story.steps.map(item => [...item]);
   if (state.ending === "archive" && state.decisions.trace === "replace") steps[1][1] = "你选择覆盖过旧申请。归档包里却仍有一张回执。\n\n文件名：被覆盖的人。\n处理意见：如果连你也不记得我，就没有人知道被删掉的是什么了。";
   if (state.ending === "erased" && state.decisions.blank === "fill") steps[0][1] += "\n\n补齐姓名时，你选择了‘当前申请人’。删除队列沿用了这个名字。";
+  if (state.ending === "waiting" && state.branchAction === "stay") steps[3] = ["退回的站内信", "你的回复：我还在这里。不要替我退出。\n\n系统退回：同一账号不能向自己发送站内信。\n\n对方的输入状态停了。在线名单仍只有一人。\n你第一次不敢确定，停下来的是哪一个。"];
+  if (state.ending === "erased" && state.branchAction === "claim") steps[3] = ["编号核验结果", "申请 444 已找到。\n申请人：第443位访问者。\n提交内容：请证明我不是前一个人。\n\n页面为你的申诉分配了新编号：445。\n它保存了你的话，只是不肯承认说话的是你。"];
+  if (state.ending === "refusal" && state.branchAction === "send") steps[3] = ["信件已投递", "收件人：第445位访问者。\n状态：已读。\n阅读时间：早于你的本次申请。\n\n发件箱里只剩下一个回信按钮。\n你终于想起，最初那句劝你不要继续的话，就是这样到这里的。"];
+  if (state.ending === "archive" && state.decisions.blank === "fill") steps[2][1] += "\n\n副本里还有你先前补入的姓名。封存时，你可以选择不把它写进原件。";
+  const task = branchTasks[state.ending];
+  const taskPanel = document.querySelector("#branchTask");
+  taskPanel.hidden = beat !== 2;
+  taskPanel.innerHTML = beat === 2 ? `<h2>${task.title}</h2><p>${textToHtml(task.body)}</p>${task.input ? '<form id="identityClaimForm"><label>本次申请编号<input name="claim" inputmode="numeric" maxlength="3" autocomplete="off" required></label><button class="old-button" type="submit">提交申诉</button><p id="claimFeedback" role="status"></p></form>' : `<div class="branch-actions">${task.options.map(([value, label]) => `<button class="old-button" data-finish-branch="${value}" type="button">${label}</button>`).join("")}</div>`}` : "";
+  if (beat === 3) recordEnding(state.ending);
   document.querySelector("#branchEndingContent").innerHTML = steps.slice(0, beat + 1).map(([title, body]) => `<article class="ending-letter"><header>${escapeHtml(title)}</header><p>${textToHtml(body)}</p></article>`).join("");
-  document.querySelector("#endingNext").hidden = beat >= 3;
+  document.querySelector("#endingNext").hidden = beat >= 2;
   document.querySelector("#endingNext").textContent = story.actions[beat] || "";
   document.querySelector("#endingResolved").hidden = beat < 3;
   document.querySelector("#endingLabel").textContent = story.label;
@@ -242,7 +297,7 @@ let deadReturnFocus = null;
 let endingTimers = [];
 let bodyTypingTimer = null;
 let audioContext = null;
-let endingMuted = false;
+let endingMuted = state.muted;
 history.scrollRestoration = "manual";
 
 function loadState() {
@@ -254,6 +309,13 @@ function loadState() {
       : recoveryStep >= 7 ? "manifesting" : "none";
     return {
       ...freshState(),
+      completed: Object.fromEntries(Object.entries(saved?.completed || {}).filter(([key, value]) => endingNames[key] && value && typeof value.time === "string")),
+      branchAction: typeof saved?.branchAction === "string" ? saved.branchAction : "",
+      composeTitle: typeof saved?.composeTitle === "string" ? saved.composeTitle.slice(0, 4) : "",
+      composePosition: Math.max(0, Math.min(possessionBodyText.length, Math.floor(Number(saved?.composePosition) || 0))),
+      muted: Boolean(saved?.muted),
+      ghostRead: Math.max(0, Math.min(6, Math.floor(Number(saved?.ghostRead) || 0))),
+      blackoutSeen: Boolean(saved?.blackoutSeen),
       storyStarted: Boolean(saved?.storyStarted),
       decisions: Object.fromEntries(Object.entries(saved?.decisions || {}).filter(([key, value]) => ["trace", "subject", "blank"].includes(key) && ["keep", "replace", "visitor", "owner", "leave", "fill"].includes(value))),
       verdict: ["later", "alive", "empty"].includes(saved?.verdict) ? saved.verdict : "later",
@@ -274,11 +336,15 @@ function loadState() {
 }
 
 function freshState() {
-  return { decisions: {}, verdict: "later", ending: "", endingBeat: 0, diaryVisits: [], storyStarted: false, recoveryStep: 0, threadPage: 1, threadMode: "all", ordinaryTitle: "十年前的网吧，现在还有人记得吗", endingPhase: "none", composeReturnAttempts: 0, publishedAt: "" };
+  return { ghostRead: 0, blackoutSeen: false, completed: {}, branchAction: "", composeTitle: "", composePosition: 0, muted: false, decisions: {}, verdict: "later", ending: "", endingBeat: 0, diaryVisits: [], storyStarted: false, recoveryStep: 0, threadPage: 1, threadMode: "all", ordinaryTitle: "十年前的网吧，现在还有人记得吗", endingPhase: "none", composeReturnAttempts: 0, publishedAt: "" };
 }
 
 function saveState() {
-  localStorage.setItem(storageKey, JSON.stringify(state));
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(state));
+  } catch {
+    document.querySelector("#saveStatus").textContent = "本次进度暂存于当前页面，关闭后可能丢失";
+  }
 }
 
 function pad(value) {
@@ -490,36 +556,16 @@ function ghostFloorHtml(post) {
 
 function startGhostSequence() {
   clearEndingTimers();
-  ghostReplies.innerHTML = "";
-  ghostThreadStats.textContent = "点击：32330　回复：437　共 3 页";
-  ghostSystemText.textContent = "正在恢复缺失回复……";
-  ghostContinue.hidden = true;
   document.body.classList.add("ghost-mode");
-  document.querySelector("#navUserButton").textContent = "用户中心";
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const spacing = reducedMotion ? 80 : 1450;
-
-  ghostPosts.forEach((post, index) => {
-    later(() => {
-      ghostReplies.insertAdjacentHTML("beforeend", ghostFloorHtml(post));
-      ghostThreadStats.textContent = `点击：32330　回复：${post.floor}　共 4 页`;
-      ghostSystemText.textContent = index === 0 ? "已找到 1 条不属于当前快照的回复。" : `仍在写入…… ${post.floor} / 437`;
-      playReplySound(index);
-      if (index === 1) document.querySelector("#navUserButton").textContent = "南康好友";
-      if (index === 3) {
-        document.querySelector("#navUserButton").textContent = "南康白起";
-        document.body.classList.add("identity-slip");
-      }
-      ghostReplies.lastElementChild?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "end" });
-    }, (index + 1) * spacing);
-  });
-
-  later(() => {
-    ghostSystemText.textContent = "恢复进度：99%　两份身份记录发生冲突。";
-    ghostContinue.hidden = false;
-    ghostContinue.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" });
-    continueRecoveryButton.focus({ preventScroll: true });
-  }, (ghostPosts.length + 1) * spacing);
+  const count = state.ghostRead;
+  ghostReplies.innerHTML = ghostPosts.slice(0, count).map(ghostFloorHtml).join("");
+  ghostThreadStats.textContent = `点击：32330　回复：${437 + count}　共 ${count ? 4 : 3} 页`;
+  ghostSystemText.textContent = count === 6 ? "恢复进度：99%　两份身份记录发生冲突。" : `恢复队列：${count} / 6　等待读取`;
+  document.querySelector("#readGhostReply").hidden = count >= 6;
+  ghostContinue.hidden = count < 6;
+  document.querySelector("#navUserButton").textContent = count >= 4 ? "南康白起" : count >= 2 ? "南康好友" : "用户中心";
+  document.body.classList.toggle("identity-slip", count >= 4);
+  if (count > 0) ghostReplies.lastElementChild?.scrollIntoView({ block: "center", behavior: "auto" });
 }
 
 function composeWarningText() {
@@ -536,7 +582,9 @@ function updatePublishAvailability() {
 function renderCompose() {
   clearEndingTimers();
   document.body.classList.add("ghost-mode");
-  composeWarning.textContent = composeWarningText();
+  possessionTitleInput.value = state.composeTitle;
+  possessionBody.value = possessionBodyText.slice(0, state.composePosition);
+  composeWarning.textContent = state.branchAction === "sign" ? "归档副本已经签收了你的名字。现在还差一份告别。" : state.branchAction === "yield" ? "对方接受了你的退出请求。请留下最后一篇帖子。" : composeWarningText();
   composeAuthor.textContent = possessionTitleInput.value ? "南康白起" : "南康好友";
   composeStatus.textContent = possessionTitleInput.value ? "在线" : "身份核对中";
   if (!possessionTitleInput.value) possessionBody.value = "";
@@ -551,6 +599,8 @@ function startBodyTyping() {
   bodyTypingTimer = window.setInterval(() => {
     position += 1;
     possessionBody.value = possessionBodyText.slice(0, position);
+    state.composePosition = position;
+    if (position % 20 === 0 || position >= possessionBodyText.length) saveState();
     possessionBody.scrollTop = possessionBody.scrollHeight;
     if (position >= possessionBodyText.length) {
       window.clearInterval(bodyTypingTimer);
@@ -582,21 +632,27 @@ function renderPublishedEnding() {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const replyOneDelay = reducedMotion ? 100 : 1200;
   const replyTwoDelay = reducedMotion ? 200 : 2600;
-  const blackoutDelay = reducedMotion ? 1600 : 12000;
+  document.querySelector("#publishedContinue").hidden = true;
+  if (state.blackoutSeen) { revealBlackout(); return; }
   later(() => document.querySelector(".possession-reply")?.classList.add("revealed"), replyOneDelay);
   later(() => {
     document.querySelector(".second-reply")?.classList.add("revealed");
+    document.querySelector("#publishedContinue").hidden = false;
     playReplySound(1);
   }, replyTwoDelay);
+}
+
+function revealBlackout() {
+  clearEndingTimers();
+  state.blackoutSeen = true; saveState();
+  setBlackoutOpen(true);
+  requestAnimationFrame(() => blackoutEnding.classList.add("active"));
+  playBlackoutSound();
   later(() => {
-    setBlackoutOpen(true);
-    requestAnimationFrame(() => blackoutEnding.classList.add("active"));
-    playBlackoutSound();
-    later(() => {
-      blackoutEnding.classList.add("message-visible");
-      blackoutEnding.querySelector("button")?.focus({ preventScroll: true });
-    }, reducedMotion ? 50 : 850);
-  }, blackoutDelay);
+    blackoutEnding.classList.add("message-visible");
+    recordEnding("possession");
+    blackoutEnding.querySelector("button")?.focus({ preventScroll: true });
+  }, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 50 : 850);
 }
 
 function pageFromHash() {
@@ -606,7 +662,7 @@ function pageFromHash() {
 
 function showPage(requestedPage, addHistory = true) {
   setBlackoutOpen(false);
-  let next = Math.max(0, Math.min(14, Number(requestedPage) || 0));
+  let next = Math.max(0, Math.min(15, Number(requestedPage) || 0));
   const phasePage = { manifesting: 9, review: 13, compose: 11, published: 12, resolved: 14 };
   if ([8, 9, 11, 12, 13, 14].includes(next) && state.recoveryStep >= 7) next = phasePage[state.endingPhase] || 9;
   if ([9, 11, 12, 13, 14].includes(next) && state.recoveryStep < 7) next = 8;
@@ -645,6 +701,7 @@ function showPage(requestedPage, addHistory = true) {
           : `${document.querySelector(`#page-${next} h1, #page-${next} [id^="title-"]`)?.textContent?.trim() || "旧帖"} - 旧页镜像`;
 
   if (next === 13) document.title = "冲突处理 - 远岸用户中心";
+  if (next === 15) document.title = "已归档回执 - 远岸用户中心";
   if (next === 14) document.title = `${branchStories[state.ending]?.title || "申请记录"} - 远岸用户中心`;
   if (addHistory) history.pushState({ page: next }, "", `#page-${next}`);
   window.scrollTo({ top: 0, behavior: "auto" });
@@ -656,6 +713,7 @@ function showPage(requestedPage, addHistory = true) {
   else if (next === 12) renderPublishedEnding();
   else if (next === 13) renderReview();
   else if (next === 14) renderBranchEnding();
+  else if (next === 15) renderCollection();
   else if (next !== 9) {
     clearEndingTimers();
     document.body.classList.remove("ghost-mode", "identity-slip", "published-mode");
@@ -741,6 +799,16 @@ function submitRecovery(form) {
 }
 
 document.addEventListener("click", event => {
+  if (event.target.closest("#readGhostReply") && state.endingPhase === "manifesting") {
+    state.ghostRead = Math.min(6, state.ghostRead + 1); saveState(); startGhostSequence(); return;
+  }
+  if (event.target.closest("#publishedContinue") && state.endingPhase === "published") { prepareEndingAudio(); revealBlackout(); return; }
+
+  if (event.target.closest("[data-collection]")) { showPage(15); return; }
+  if (event.target.closest("[data-new-run]")) { restartRun(); return; }
+  const finish = event.target.closest("[data-finish-branch]");
+  if (finish) { finishBranch(finish.dataset.finishBranch); return; }
+
   const decision = event.target.closest("[data-decision]");
   if (decision) {
     const checkpoint = checkpoints.find(item => item.key === decision.dataset.decision && item.step === state.recoveryStep);
@@ -751,11 +819,13 @@ document.addEventListener("click", event => {
   const branchAction = event.target.closest("[data-branch-action]");
   if (branchAction) { chooseBranch(branchAction.dataset.branchAction); return; }
   if (event.target.closest("[data-ending-next]")) {
-    state.endingBeat = Math.min(3, state.endingBeat + 1); saveState(); renderBranchEnding(); return;
+    if (state.endingPhase !== "resolved" || state.endingBeat >= 2) return;
+    state.endingBeat = Math.min(2, state.endingBeat + 1); saveState(); renderBranchEnding(); return;
   }
   if (event.target.closest("[data-replay-branch]")) {
     state.endingPhase = "review"; state.ending = ""; state.endingBeat = 0;
     possessionTitleInput.value = ""; possessionBody.value = "";
+    state.composeTitle = ""; state.composePosition = 0; state.branchAction = ""; state.blackoutSeen = false;
     saveState(); showPage(13); return;
   }
   if (event.target.closest("[data-withdraw]")) { resolveEnding("refusal"); return; }
@@ -769,6 +839,7 @@ document.addEventListener("click", event => {
   }
   if (event.target === soundToggle || event.target.closest("[data-mute]")) {
     endingMuted = !endingMuted;
+    state.muted = endingMuted; saveState();
     soundToggle.textContent = endingMuted ? "声音：关" : "声音：开";
     document.querySelector("[data-mute]").textContent = soundToggle.textContent;
     if (endingMuted) audioContext?.suspend();
@@ -830,6 +901,15 @@ document.addEventListener("click", event => {
 });
 
 document.addEventListener("submit", event => {
+  if (event.target.id === "identityClaimForm") {
+    event.preventDefault();
+    if (event.target.elements.claim.value.trim() !== "444") {
+      document.querySelector("#claimFeedback").textContent = "与本页回执编号不符。请查看页面上方的申请记录。";
+      return;
+    }
+    finishBranch("claim"); return;
+  }
+
   if (event.target === possessionPostForm) {
     event.preventDefault();
     if (possessionTitleInput.value.trim() !== "一路走好" || possessionBody.value !== possessionBodyText) return;
@@ -856,6 +936,7 @@ document.addEventListener("submit", event => {
 });
 
 possessionTitleInput.addEventListener("input", () => {
+  state.composeTitle = possessionTitleInput.value; saveState();
   const hasInput = Boolean(possessionTitleInput.value);
   composeAuthor.textContent = hasInput ? "南康白起" : "南康好友";
   composeStatus.textContent = hasInput ? "在线" : "身份核对中";
@@ -880,9 +961,11 @@ document.addEventListener("keydown", event => {
   }
 });
 
-document.querySelector("#restartButton").addEventListener("click", () => {
+function restartRun() {
   clearEndingTimers();
-  state = freshState();
+  const completed = state.completed;
+  const muted = state.muted;
+  state = { ...freshState(), completed, muted };
   saveState();
   possessionTitleInput.value = "";
   possessionBody.value = "";
@@ -898,13 +981,17 @@ document.querySelector("#restartButton").addEventListener("click", () => {
     form.querySelector(".recovery-feedback").textContent = "";
   });
   showPage(0);
-});
+}
+document.querySelector("#restartButton").addEventListener("click", restartRun);
 
 window.addEventListener("popstate", event => {
   const page = Number.isInteger(Number(event.state?.page)) ? Number(event.state.page) : pageFromHash();
   showPage(page, false);
 });
 
+window.addEventListener("pagehide", saveState);
+soundToggle.textContent = endingMuted ? "声音：关" : "声音：开";
+document.querySelector("[data-mute]").textContent = soundToggle.textContent;
 const initialPage = pageFromHash();
 if (initialPage >= 1 && initialPage <= 14 && initialPage !== 10) {
   state.storyStarted = true;

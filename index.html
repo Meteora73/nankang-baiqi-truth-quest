@@ -14,7 +14,7 @@
   <meta property="og:image" content="og.png?v=20260830-3">
   <title>远岸社区旧版镜像 - 在远处，也在一起</title>
   <link rel="icon" href="favicon.svg?v=20260830-3" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=20260905-2">
+  <link rel="stylesheet" href="styles.css?v=20260928-1">
 </head>
 <body>
   <div class="fiction-line">※ 剧情为虚构。</div>
@@ -369,7 +369,7 @@
           <div class="archive-floor-body">所有链接都回到这里。还要继续登录吗？</div>
         </article>
         <div id="ghostReplies" class="ghost-replies" aria-live="polite"></div>
-        <div class="ghost-continue" id="ghostContinue" hidden>
+        <button class="old-button" id="readGhostReply" type="button">读取下一条恢复回复</button><div class="ghost-continue" id="ghostContinue" hidden>
           <p>账号恢复尚未完成。</p>
           <button class="old-button" type="button" id="continueRecoveryButton">处理恢复申请</button>
         </div>
@@ -429,6 +429,7 @@
           <header class="archive-floor-head"><span>作者：<b>末页来客</b></span><span>时间：<span class="reply-now"></span></span><span class="archive-floor-actions">回复　举报　2楼</span></header>
           <div class="archive-floor-body">不是真的吧？<br>他刚才还在线。</div>
         </article>
+        <button class="old-button" id="publishedContinue" type="button" hidden>退出当前账号</button>
         <div class="blackout-ending" id="blackoutEnding" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="身份转移完成">
           <div class="blackout-noise"></div>
           <div class="blackout-message">
@@ -437,7 +438,7 @@
             <div>南康白起：<b>在线</b><br>第444位访问者：该用户已注销</div>
             <button type="button" data-mute>声音：开</button>
             <button type="button" data-replay-branch>重选最后的处理方式</button>
-            <button type="button" id="restartButton">重新开始</button>
+            <button type="button" data-collection>已归档回执</button><button type="button" id="restartButton">重新开始</button>
           </div>
         </div>
       </section>
@@ -464,15 +465,20 @@
         <div class="crumb">用户中心 &gt; 申请记录 &gt; 444</div>
         <div class="branch-ending-window">
           <div class="panel-title" id="branchEndingTitle"></div>
-          <div id="branchEndingContent" aria-live="polite"></div>
+          <div id="branchEndingContent" aria-live="polite"></div><div id="branchTask" class="branch-task" hidden></div>
           <button class="old-button" type="button" id="endingNext" data-ending-next>继续阅读</button>
-          <div id="endingResolved" hidden><p id="endingLabel"></p><button class="old-button" type="button" data-goto="0">返回社区</button> <button class="old-button" type="button" data-replay-branch>重选最后的处理方式</button></div>
+          <div id="endingResolved" hidden><p id="endingLabel"></p><button class="old-button" type="button" data-collection>已归档回执</button> <button class="old-button" type="button" data-goto="0">返回社区</button> <button class="old-button" type="button" data-replay-branch>重选最后的处理方式</button></div>
         </div>
+      </section>
+      <section class="screen" id="page-15" data-page="15" aria-labelledby="title-15">
+        <div class="crumb">用户中心 &gt; 已归档回执</div>
+        <div class="branch-ending-window"><div class="panel-title" id="title-15">已归档回执 <span id="collectionCount">0 / 5</span></div>
+        <div id="collectionList"></div><div class="branch-actions"><button class="old-button" id="collectionReplay" data-replay-branch type="button">回到最后的分歧点</button><button class="old-button" data-new-run type="button">从头重玩，保留回执</button><button class="old-button" data-goto="0" type="button">返回社区</button></div></div>
       </section>
     </main>
 
     <div class="page-status">
-      <span id="pageCounter">专题首页</span><button type="button" class="sound-toggle" id="soundToggle" hidden>声音：开</button>
+      <span id="pageCounter">专题首页</span><button class="sound-toggle" type="button" data-collection hidden>已归档回执</button><span id="saveStatus" role="status"></span><button type="button" class="sound-toggle" id="soundToggle" hidden>声音：开</button>
       <span>最佳浏览：1024×768　IE6.0 以上</span>
     </div>
     <footer>
@@ -507,8 +513,8 @@
     </div>
   </div>
 
-  <script src="thread-source-data.js?v=20260905-2"></script>
-  <script src="diary-data.js?v=20260905-2"></script>
-  <script src="app.js?v=20260905-2"></script>
+  <script src="thread-source-data.js?v=20260928-1"></script>
+  <script src="diary-data.js?v=20260928-1"></script>
+  <script src="app.js?v=20260928-1"></script>
 </body>
 </html>
