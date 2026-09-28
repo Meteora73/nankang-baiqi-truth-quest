@@ -14,7 +14,7 @@
   <meta property="og:image" content="og.png?v=20260830-3">
   <title>远岸社区旧版镜像 - 在远处，也在一起</title>
   <link rel="icon" href="favicon.svg?v=20260830-3" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=20260928-1">
+  <link rel="stylesheet" href="styles.css?v=20260928-2">
 </head>
 <body>
   <div class="fiction-line">※ 剧情为虚构。</div>
@@ -292,68 +292,7 @@
             <p id="recoveryIdentityNote" class="access-receipt"></p><div id="recoveryReceipt" class="recovery-receipt" hidden></div>
             <div class="recovery-progress" aria-label="账号恢复进度"><i id="recoveryProgressBar"></i></div>
 
-            <form class="recovery-question active" data-recovery-form data-key="relation" data-answer="reader">
-              <div class="question-no">密保问题 1</div>
-              <h2>悼念帖楼主如何说明自己与南康的关系？</h2>
-              <label><input type="radio" name="relation" value="reader"> 只听过名字、了解一点的网友</label>
-              <label><input type="radio" name="relation" value="classmate"> 现实中的同学和好友</label>
-              <label><input type="radio" name="relation" value="reporter"> 负责报道的记者</label>
-              <button class="old-button verify-button" type="submit">提交答案</button>
-              <p class="recovery-feedback" aria-live="polite"></p>
-            </form>
-
-            <form class="recovery-question" data-recovery-form data-key="days" data-answer="18">
-              <div class="question-no">密保问题 2</div>
-              <h2>转述里说 3 月 9 日失去联系，悼念帖发布于 3 月 27 日。两日相隔多少天？</h2>
-              <label class="input-answer">请输入数字：<input name="days" inputmode="numeric" autocomplete="off" maxlength="3"></label>
-              <button class="old-button verify-button" type="submit">提交答案</button>
-              <p class="recovery-feedback" aria-live="polite"></p>
-            </form>
-
-            <form class="recovery-question" data-recovery-form data-key="source" data-answer="missing-source">
-              <div class="question-no">密保问题 3</div>
-              <h2>“旺仔”转述作为直接证词，最关键的是缺少什么？</h2>
-              <label><input type="radio" name="source" value="photo"> 一张当事人的照片</label>
-              <label><input type="radio" name="source" value="school"> 学校名称和班级名单</label>
-              <label><input type="radio" name="source" value="missing-source"> 原账号、原帖日期、楼层与链接</label>
-              <button class="old-button verify-button" type="submit">提交答案</button>
-              <p class="recovery-feedback" aria-live="polite"></p>
-            </form>
-
-            <form class="recovery-question" data-recovery-form data-key="dates" data-answer="050705190615">
-              <div class="question-no">密保问题 4</div>
-              <h2>账号记录中，上线、重置、注销三项的月日依次是什么？</h2>
-              <p class="format-hint">按“月日月日月日”连接输入，共 12 位数字。</p>
-              <label class="input-answer">请输入日期串：<input name="dates" inputmode="numeric" autocomplete="off" maxlength="12"></label>
-              <button class="old-button verify-button" type="submit">提交答案</button>
-              <p class="recovery-feedback" aria-live="polite"></p>
-            </form>
-
-            <form class="recovery-question" data-recovery-form data-key="diary" data-answer="那个人">
-              <div class="question-no">密保问题 5</div>
-              <h2>日记目录中，被加密的那篇日记叫什么？</h2>
-              <label class="input-answer">请输入标题：<input name="diary" autocomplete="off" maxlength="20"></label>
-              <button class="old-button verify-button" type="submit">提交答案</button>
-              <p class="recovery-feedback" aria-live="polite"></p>
-            </form>
-
-            <form class="recovery-question" data-recovery-form data-key="floor" data-answer="1894">
-              <div class="question-no">密保问题 6</div>
-              <h2>闲情调查中，最后一条可以复核的登录记录在第几楼？</h2>
-              <label class="input-answer">请输入楼层号：<input name="floor" inputmode="numeric" autocomplete="off" maxlength="4"></label>
-              <button class="old-button verify-button" type="submit">提交答案</button>
-              <p class="recovery-feedback" aria-live="polite"></p>
-            </form>
-
-            <form class="recovery-question" data-recovery-form data-key="ghost" data-answer="later-users">
-              <div class="question-no">密保问题 7</div>
-              <h2>是谁不断制造了账号“死后上线”的记录？</h2>
-              <label><input type="radio" name="ghost" value="owner"> 原账号主人</label>
-              <label><input type="radio" name="ghost" value="admin"> 新闻网站管理员</label>
-              <label><input type="radio" name="ghost" value="later-users"> 后来拿泄露凭据验证传闻的人</label>
-              <button class="old-button verify-button" type="submit">完成验证</button>
-              <p class="recovery-feedback" aria-live="polite"></p>
-            </form>
+            <div id="recoveryQuestions"></div>
 
             <div class="recovery-actions"><button type="button" data-goto="1">返回原帖查找相关链接</button><span>已完成的密保进度会自动保存</span></div>
           </div>
@@ -366,7 +305,7 @@
         <div class="ghost-system-line"><span id="ghostSystemText">正在恢复缺失回复……</span></div>
         <article class="archive-floor ghost-seed-floor">
           <header class="archive-floor-head"><span>作者：<b>南康好友</b></span><span>时间：2015-05-29 03:35</span><span class="archive-floor-actions">回复　举报　437楼</span></header>
-          <div class="archive-floor-body">所有链接都回到这里。还要继续登录吗？</div>
+          <div class="archive-floor-body">这条申请尚未填完。剩下的部分，已经有人替你写了。</div>
         </article>
         <div id="ghostReplies" class="ghost-replies" aria-live="polite"></div>
         <button class="old-button" id="readGhostReply" type="button">读取下一条恢复回复</button><div class="ghost-continue" id="ghostContinue" hidden>
@@ -399,12 +338,12 @@
           <div class="post-editor-title"><b id="title-11">发表新主题</b><span>账号恢复的最后一步</span></div>
           <div class="post-editor-account">当前用户：<strong id="composeAuthor">南康好友</strong>　状态：<span id="composeStatus">身份核对中</span></div>
           <form id="possessionPostForm">
-            <label class="editor-title-label">标题：<span>[左岸文字] 第444位访问者，</span><input id="possessionTitleInput" autocomplete="off" maxlength="4" aria-label="补全帖子标题"></label>
-            <p class="editor-instruction">请亲手输入标题最后四个字，确认您仍拥有写入权限。</p>
+            <label class="editor-title-label">标题：<span>[左岸文字] 第444位访问者，</span><select id="possessionTitleInput" aria-label="选择帖子标题"><option value="">请选择标题</option><option value="一路走好">一路走好</option><option value="仍在等你">仍在等你</option><option value="请勿回复">请勿回复</option></select></label>
+            <p class="editor-instruction">请选择一个标题。正文已经替你保存在草稿里。</p>
             <label class="editor-body-label">正文：<textarea id="possessionBody" readonly aria-label="帖子正文"></textarea></label>
             <div class="editor-actions">
               <button class="old-button" type="button" id="composeReturnButton">返回原帖</button>
-              <button class="old-button" type="button" data-withdraw>撤回恢复申请</button>
+
               <button class="old-button publish-button" type="submit" id="publishPossessionButton" disabled>发 表</button>
             </div>
             <p class="compose-warning" id="composeWarning" aria-live="polite"></p>
@@ -437,27 +376,8 @@
             <p>身份转移完成。结局五 · 替他留下。</p>
             <div>南康白起：<b>在线</b><br>第444位访问者：该用户已注销</div>
             <button type="button" data-mute>声音：开</button>
-            <button type="button" data-replay-branch>重选最后的处理方式</button>
+            <button type="button" data-replay-branch>重新核对密保</button>
             <button type="button" data-collection>已归档回执</button><button type="button" id="restartButton">重新开始</button>
-          </div>
-        </div>
-      </section>
-      <section class="screen" id="page-13" data-page="13" aria-labelledby="title-13">
-        <div class="crumb">用户中心 &gt; 账号恢复 &gt; 冲突处理</div>
-        <div class="recovery-review">
-          <div class="panel-title" id="title-13">同一个账号，不能恢复成两个人</div>
-          <p>你答出的七项资料都能在网页里找到。任何人都可以答对。<br>系统却把这些答案当成了你的过去。</p>
-          <pre id="branchReceipt" class="receipt-text"></pre>
-          <fieldset><legend>这些记录说明了什么？</legend>
-            <label><input type="radio" name="verdict" value="later"> 后来的人反复登录，记录不属于原主人。</label>
-            <label><input type="radio" name="verdict" value="alive"> 原主人仍在这里。他没有离开这个账号。</label>
-            <label><input type="radio" name="verdict" value="empty"> 没有原主人。大家在替同一个空缺填写人生。</label>
-          </fieldset>
-          <p class="review-whisper">附言：如果你不愿意成为我，就别替我证明我是谁。</p>
-          <div class="branch-actions">
-            <button class="old-button" type="button" id="branchPreserve" data-branch-action="preserve">保留记录，结束调查</button>
-            <button class="old-button" type="button" id="branchContact" data-branch-action="contact">清除没有持有人的身份</button>
-            <button class="old-button" type="button" data-branch-action="restore">这些答案也是我的。继续恢复</button>
           </div>
         </div>
       </section>
@@ -467,13 +387,13 @@
           <div class="panel-title" id="branchEndingTitle"></div>
           <div id="branchEndingContent" aria-live="polite"></div><div id="branchTask" class="branch-task" hidden></div>
           <button class="old-button" type="button" id="endingNext" data-ending-next>继续阅读</button>
-          <div id="endingResolved" hidden><p id="endingLabel"></p><button class="old-button" type="button" data-collection>已归档回执</button> <button class="old-button" type="button" data-goto="0">返回社区</button> <button class="old-button" type="button" data-replay-branch>重选最后的处理方式</button></div>
+          <div id="endingResolved" hidden><p id="endingLabel"></p><button class="old-button" type="button" data-collection>已归档回执</button> <button class="old-button" type="button" data-goto="0">返回社区</button> <button class="old-button" type="button" data-replay-branch>重新核对密保</button></div>
         </div>
       </section>
       <section class="screen" id="page-15" data-page="15" aria-labelledby="title-15">
         <div class="crumb">用户中心 &gt; 已归档回执</div>
-        <div class="branch-ending-window"><div class="panel-title" id="title-15">已归档回执 <span id="collectionCount">0 / 5</span></div>
-        <div id="collectionList"></div><div class="branch-actions"><button class="old-button" id="collectionReplay" data-replay-branch type="button">回到最后的分歧点</button><button class="old-button" data-new-run type="button">从头重玩，保留回执</button><button class="old-button" data-goto="0" type="button">返回社区</button></div></div>
+        <div class="branch-ending-window"><div class="panel-title" id="title-15">已归档回执 <span id="collectionCount">0 / 8</span></div>
+        <div id="collectionList"></div><div class="branch-actions"><button class="old-button" id="collectionReplay" data-replay-branch type="button">重新核对密保</button><button class="old-button" data-new-run type="button">从头重玩，保留回执</button><button class="old-button" data-goto="0" type="button">返回社区</button></div></div>
       </section>
     </main>
 
@@ -513,8 +433,9 @@
     </div>
   </div>
 
-  <script src="thread-source-data.js?v=20260928-1"></script>
-  <script src="diary-data.js?v=20260928-1"></script>
-  <script src="app.js?v=20260928-1"></script>
+  <script src="thread-source-data.js?v=20260928-2"></script>
+  <script src="diary-data.js?v=20260928-2"></script>
+  <script src="game-rules.js?v=20260928-2"></script>
+  <script src="app.js?v=20260928-2"></script>
 </body>
 </html>

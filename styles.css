@@ -583,3 +583,16 @@ body.identity-slip .post-editor-account strong { color: #7a1717; }
 #saveStatus:empty { display: none; }
 #saveStatus { color: #852c20; }
 @media (max-width: 600px) { .branch-task { padding: 12px; } #endingResolved button { min-height: 42px; } }
+/* All security questions use large, unselected radio choices. */
+.answer-options { border: 0; margin: 0 0 16px; padding: 0; min-width: 0; }
+.answer-options label { display: flex; align-items: flex-start; gap: 9px; margin: 8px 0; padding: 12px; min-height: 44px; border: 1px solid #bbc7d1; background: #f8fafb; line-height: 1.8; cursor: pointer; }
+.answer-options input { flex: 0 0 auto; margin-top: 6px; }
+.answer-options label:has(input:checked) { border-color: #426989; background: #e5edf4; }
+.answer-options label:focus-within { outline: 2px solid #426989; outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.recovery-receipt { line-height: 1.9; color: #5b5d58; font-size: 13px; }
+.received-answer { border-left: 2px solid #999; padding-left: 12px; color: #666; }
+body.record-drift .ticker { background: #deddd5; color: #59514b; }
+body.record-drift .brand-slogan { color: #777; }
+#possessionTitleInput { min-height: 42px; max-width: 100%; padding: 7px; border: 2px inset #ddd; background: #fff; font: 16px SimSun, serif; }
+@media(max-width:600px) { .answer-options label { padding: 11px 9px; } #possessionTitleInput { display: block; margin: 10px 0; width: 100%; } }

@@ -1,3 +1,5 @@
+const rules = window.QUEST_RULES;
+document.querySelector("#recoveryQuestions").innerHTML = rules.questions.map((q, index) => `<form class="recovery-question" data-recovery-form data-key="${q.key}"><div class="question-no">密保问题 ${index + 1}</div><h2>${escapeHtml(q.title)}</h2><fieldset class="answer-options"><legend class="sr-only">选择一项答案</legend>${q.options.map(([value, label]) => `<label><input type="radio" name="${q.key}" value="${escapeHtml(value)}"> ${escapeHtml(label)}</label>`).join("")}</fieldset><button class="old-button verify-button" type="submit">${index === 6 ? "完成验证" : "提交答案"}</button><p class="recovery-feedback" aria-live="polite"></p></form>`).join("");
 const screens = [...document.querySelectorAll(".screen")];
 const pageCounter = document.querySelector("#pageCounter");
 const tickerText = document.querySelector("#tickerText");
@@ -37,7 +39,7 @@ const threadSource = window.THREAD_SOURCE || { ownerPost: "", replies: [] };
 const sourceReplies = new Map((threadSource.replies || []).map(reply => [Number(reply.floor), reply]));
 const threadPageSize = 200;
 const threadPageCount = 3;
-const storageKey = "yuanan-forum-mystery-v6";
+const storageKey = "yuanan-forum-mystery-v7";
 
 const tickers = {
   0: "旧版社区仅供浏览，部分帖子及用户资料可能无法访问。",
@@ -54,27 +56,6 @@ const tickers = {
   11: "账号恢复尚未完成。请验证主题发表权限。",
   12: "主题发表成功。当前登录用户：南康白起。"
 };
-
-const ghostPosts = [
-  { floor: 438, user: "该用户已注销", time: "2008-03-09 03:35:00", html: "谁告诉你们我死了？" },
-  { floor: 439, user: "南康好友", current: true, html: "这不是我发的。" },
-  { floor: 440, user: "该用户已注销", current: true, html: "当然不是你发的。<br><br>你只回答了七个问题。<br>是你把我放进来的。" },
-  { floor: 441, user: "该用户已注销", current: true, html: "第一个问题，你说你只是听过我的名字。<br>第二个问题，你算出了十八天。<br>第五个问题，你填下了《那个人》。<br><br>你真的觉得那些问题是在验证你吗？" },
-  { floor: 442, user: "该用户已注销", current: true, html: "他们说我死了，我就有了死亡。<br>他们说我爱过，我就有了爱人。<br>他们替我写了那么多过去。<br><br>可我从来没有一个可以留在现在的人。" },
-  { floor: 443, user: "空白签名", current: true, html: "我记得这篇帖子。<br>可我记得它悼念的不是这个名字。" }
-];
-
-const possessionBodyText = `如果没有那七个答案，我想我不会去关注这样一个人。
-
-他来过这个旧论坛，回答了七个问题。第一个问题问的是别人，他却在最后签下了自己的名字。
-
-可是，他知道得太多了。
-
-知道一个人所有的过去，与成为那个人，究竟有什么区别？
-
-今天，看到系统的信息，有几分感慨，以此文字祭祀。
-
-祝他一路走好。`;
 
 const threadStoryReplies = {
   205: { user: "无名氏", time: "2015-05-27 23:44", link: true, html: "这里有人把学校名单、344 条新闻目录、旧帖转载和账号登录记录放在一楼里追查，楼数很长：<button class=\"external-link\" type=\"button\" data-goto=\"7\">[站外链接] 2015 年匿名调查楼</button>" },
@@ -131,12 +112,6 @@ const ordinaryThreads = {
   "十大最感人的网络文字": { board: "舞文弄墨", author: "旧文整理", time: "2015-05-25 20:18", views: 6712, replies: 188, body: ["只做文章索引，不做真假排名。网络文字在转载中经常被换标题、换作者，欢迎补充最早链接。", "第一批目录共十篇，已有三篇找不到首发页。"], replySeed: ["支持标出处。", "很多所谓原句其实是留言。", "求补最早发布日期。", "不要只贴截图，最好留网页地址。"] }
 };
 
-const checkpoints = [
-  { step: 2, key: "trace", title: "发现一份同号申请", text: "请求 444：空缺十八天。\n申请时间：2008-03-09 03:35。\n本次填写时间：刚刚。\n\n两份申请的答案相同。旧申请没有姓名，只有一句备注：\n“如果这次还是我，不要覆盖上一份。”", options: [["keep", "保留两份记录"], ["replace", "用本次申请覆盖"]] },
-  { step: 4, key: "subject", title: "请选择这组时间属于谁", text: "上线、重置、注销，三项日期已匹配。\n系统找不到账号主人的身份凭据，正在使用答题者的信息补齐。\n\n预览：他最后一次登录，是在你填下日期以后。", options: [["visitor", "我是代查的访客，分开保存"], ["owner", "这是我的账号，合并记录"]] },
-  { step: 6, key: "blank", title: "尚有一项资料为空", text: "《那个人》：正文不存在。\n第1894楼：记录存在。\n账号持有人：未找到。\n\n没有正文的文章仍能被阅读。没有持有人的账号，是否也能被恢复？", options: [["leave", "保留空缺，不补姓名"], ["fill", "用当前申请人补齐"]] }
-];
-
 const branchStories = {
   archive: { title: "申请已归档", label: "结局一 · 留档", account: "未登录", steps: [
     ["处理回执 / 444", "你保留了原记录，把后来的登录标为后来人的行为。没有人为缺失的正文补写一句话。\n\n账号恢复已取消。社区恢复了熟悉的蓝色。"],
@@ -160,20 +135,60 @@ const branchStories = {
     ["已离开社区", "你关掉了草稿，没有发表新的悼文。\n\n系统只保留了一条离线签名：\n“我没有进去。请不要把我算在里面。”\n\n在线人数没有减少。"] ], actions: ["查看未发送草稿", "查看草稿历史", "关闭草稿"] }
 };
 
-const endingNames = { archive: "留档", waiting: "他还活着", erased: "查无此人", refusal: "留在门外", possession: "替他留下" };
+branchStories.reversed = { title:"时间记录修复中", label:"结局 · 先注销的人", account:"离线", steps:[
+  ["时间冲突", "系统采用了你选择的顺序。为了使记录成立，它把你的注销排到了登录之前。\n\n退出操作：已完成。操作者：本次申请人。"],
+  ["个人空间", "空间里有一篇告别。作者是你，发表时间是昨天。\n\n最后一句：明天如果这个账号又上线，不要相信是我。"],
+  ["在线提示", "头像亮了。\n你的旧留言被自动回复：他昨天已经退出了。\n\n你每点击一次，都会给这句话添上一条新的证据。"],
+  ["时间已修复", "记录完整。没有剩余的时间能容纳本次申请人。"] ], actions:["查看告别", "查看在线提示"] };
+branchStories.replacement = { title:"引用来源已恢复", label:"结局 · 第1900楼", account:"旧帖作者", steps:[
+  ["记录替补", "你选的不是最后一条可以复核的登录记录。系统没有找到所需证据，便把你本次访问放进了第1900楼。"],
+  ["第1900楼", "作者：第444位访问者。\n时间：2015-05-29 03:35。\n正文：如果有人看到我在线，请帮我把这一楼删掉。\n\n你记得自己还没说过这句话。"],
+  ["有人引用了你", "回复：楼主终于又出现了。每隔一阵，他就会说自己只是路过。\n\n引用框里有你刚才的答案。后面还有一行空白，光标正在等。"],
+  ["更正记录", "更正也成为了原帖的一部分。现在有了第1901楼。"] ], actions:["打开被引用的楼层", "查看引用回复"] };
+branchStories.waiting.label = "结局 · 空出来的那一天";
+branchStories.waiting.steps[0] = ["等待记录", "你把两个日期之间的距离算错了。系统把这段无法对上的时间划进了你的账号。\n\n对方发来一句：谢谢你愿意留下来等。"];
+branchStories.erased.label = "结局 · 没有来源的人";
+branchStories.erased.steps[0] = ["来源记录", "你接受了一种不需要原始发言人的证明。系统按照这个标准，开始整理本次会话。\n\n原帖还在，文字还在。只有正在说话的人不再必要。"];
+branchStories.refusal.label = "结局 · 下一位";
+branchStories.refusal.steps[0] = ["操作记录", "你的答案没有把后来的验证者算进去。系统因此没有登记你刚才的登录尝试。\n\n你已离开。\n下面还有一句：尚未轮到你离开。"];
+
+const endingNames = { archive: "留档", ...Object.fromEntries(rules.failures.map(route => [route.ending, route.name])) };
 const branchTasks = {
-  archive: { title: "归档前比对", body: "原账号的持有人一栏是空白。归档副本却建议填入：第444位访问者。", options: [["leave", "保留空白，封存副本"], ["sign", "用我的身份补齐副本"]] },
-  waiting: { title: "回复站内信", body: "对方：我们只能留一个会话。你愿意把现在让给我吗？", options: [["stay", "我还在这里。不要替我退出。"], ["yield", "好。这次我先走。"]] },
-  erased: { title: "身份申诉", body: "请填写一项只属于本次访问者的记录。系统已经有你的陈述，不接受重复提交。\n\n你现在能提供的，是申请编号。", input: true },
-  refusal: { title: "离开前处理草稿", body: "收件人：第445位访问者。\n正文：不要回答最后一个问题。它问的不是谁死了。\n\n这封信每次都停在发出之前。", options: [["unsent", "保留为草稿，离开"], ["send", "把提醒留给下一位访客"]] }
+  archive: { title: "封存原始记录", body: "七项记录核对完成。缺失的部分依然缺失。你不需要替任何人补齐。", options: [["leave", "保留空白，封存记录"]] },
+  waiting: { title: "对方仍在输入", body: "最后一条消息一直没有发完。你想让它知道你还在。", options: [["stay", "我还在。"], ["yield", "我等你。"]] },
+  erased: { title: "身份申诉", body: "请选择你能证明自己存在的那一项。", options: [["claim", "本次申请编号：444"], ["voice", "这些字是我刚才亲自选的"]] },
+  reversed: { title: "时间修复", body: "你的注销时间早于登录时间。请选择要保留的一项。", options: [["login", "保留这次登录"], ["logout", "保留退出记录"]] },
+  replacement: { title: "原帖引用通知", body: "有人把你的这次浏览当成了旧帖证据。", options: [["deny", "这不是当年的记录"], ["remove", "撤回这条引用"]] },
+  refusal: { title: "离开前处理草稿", body: "收件人：下一位访问者。\n正文：不要恢复这个账号。\n发件时间：你到来之前。", options: [["unsent", "保留为草稿，离开"], ["send", "把提醒留给下一位访客"]] }
 };
+
+function failureRoute() { return rules.failures[state.failedQuestion - 1]; }
+function hasOutcome() { return state.failedQuestion > 0 || state.recoveryStep === 7; }
+function currentPossessionBody() { return failureRoute()?.body || ""; }
+function outcomeRoute() { return failureRoute()?.ending || "archive"; }
+function retryQuestion() {
+  const step = state.failedQuestion ? state.failedQuestion - 1 : 0;
+  const previous = state.answers.slice(0, step);
+  const completed = state.completed, muted = state.muted;
+  clearEndingTimers();
+  state = { ...freshState(), completed, muted, answers: previous, recoveryStep: step, storyStarted: true };
+  recoveryForms.forEach(form => { form.reset(); form.querySelector("button").disabled = false; });
+  possessionTitleInput.value = ""; possessionBody.value = "";
+  saveState(); showPage(8);
+}
+function enterOutcome() {
+  const key = outcomeRoute();
+  if (["possession", "diary"].includes(key)) {
+    state.endingPhase = "compose"; state.ending = key; saveState(); showPage(11);
+  } else resolveEnding(key);
+}
 
 function recordEnding(key) {
   if (!endingNames[key]) return;
-  const action = key === "possession" ? "publish" : state.branchAction || "legacy";
+  const action = ["possession", "diary"].includes(key) ? "publish" : state.branchAction || "read";
   const previous = state.completed[key];
-  if (previous?.action === action && JSON.stringify(previous.decisions) === JSON.stringify(state.decisions)) return;
-  state.completed[key] = { time: stamp(), decisions: { ...state.decisions }, action };
+  if (previous?.action === action && previous.failedQuestion === state.failedQuestion && previous.answer === state.answers[state.failedQuestion - 1]) return;
+  state.completed[key] = { time: stamp(), failedQuestion: state.failedQuestion, answer: state.answers[state.failedQuestion - 1] || "", action };
   saveState();
   document.querySelectorAll("[data-collection]").forEach(button => { button.hidden = false; });
 }
@@ -181,37 +196,34 @@ function recordEnding(key) {
 function renderCollection() {
   clearEndingTimers();
   document.body.classList.remove("ghost-mode", "identity-slip", "published-mode");
-  document.querySelector("#collectionCount").textContent = `${Object.keys(state.completed).length} / 5`;
+  document.querySelector("#collectionCount").textContent = `${Object.keys(state.completed).length} / 8`;
   document.querySelector("#collectionList").innerHTML = Object.entries(endingNames).map(([key, name], index) => {
     const item = state.completed[key];
-    return `<article class="ending-letter"><header>回执 ${index + 1} / ${item ? escapeHtml(item.time) : "尚未归档"}</header><h2>${item ? escapeHtml(name) : "未读取的回执"}</h2>${item ? `<p>${checkpoints.map(cp => escapeHtml(cp.options.find(([value]) => value === item.decisions?.[cp.key])?.[1] || "旧申请未记录")).join("<br>")}</p><p>最近处理：${escapeHtml(({ leave: "保留空白", stay: "保持自己的会话", claim: "提交本次申请编号", unsent: "保留草稿", send: "给下一位留信", publish: "发表悼念帖" })[item.action] || "会话已结束")}</p>` : "<p>这份回执尚未写上你的名字。</p>"}</article>`;
+    const q = rules.questions[(item?.failedQuestion || 0) - 1];
+    const answer = q?.options.find(([value]) => value === item.answer)?.[1];
+    return `<article class="ending-letter"><header>回执 ${index + 1} / ${item ? escapeHtml(item.time) : "尚未归档"}</header><h2>${item ? escapeHtml(name) : "未读取的回执"}</h2>${item ? `<p>${item.failedQuestion ? `记录从第 ${item.failedQuestion} 题发生偏移。<br>当时提交：${escapeHtml(answer || item.answer)}` : "七项密保全部核对正确。"}</p>` : "<p>这份回执尚未写上你的名字。</p>"}</article>`;
   }).join("");
-  document.querySelector("#collectionReplay").hidden = state.recoveryStep < 7;
+  document.querySelector("#collectionReplay").hidden = !hasOutcome();
   pageCounter.textContent = "用户中心 / 已归档回执";
-  tickerText.textContent = "这里保存的是你已经读完的结局。";
+  tickerText.textContent = "这里只保留你已经读完的回执。";
 }
 
 function finishBranch(action) {
   if (state.endingPhase !== "resolved" || state.endingBeat !== 2) return;
   const task = branchTasks[state.ending];
-  if (!task || !(task.input ? action === "claim" : task.options.some(([value]) => value === action))) return;
-  if (action === "sign" || action === "yield") {
-    state.branchAction = action;
-    state.endingPhase = "compose";
-    state.composeTitle = ""; state.composePosition = 0;
-    saveState(); showPage(11); return;
-  }
+  if (!task?.options.some(([value]) => value === action)) return;
   state.branchAction = action; state.endingBeat = 3;
   recordEnding(state.ending); saveState(); renderBranchEnding();
 }
 
 function renderAtmosphere(page) {
   document.querySelectorAll("[data-collection]").forEach(button => { button.hidden = Object.keys(state.completed).length === 0; });
-  const active = state.storyStarted && state.recoveryStep >= 2;
+  document.querySelectorAll("[data-replay-branch]").forEach(button => { button.textContent = state.failedQuestion ? `回到第${state.failedQuestion}题重选` : "重新核对七道密保"; });
+  const active = state.storyStarted && (state.recoveryStep >= 1 || state.failedQuestion > 0);
   document.querySelector("#visitCount").textContent = active ? "000444" : "000035";
-  soundToggle.hidden = state.recoveryStep < 7;
+  soundToggle.hidden = !hasOutcome();
   document.body.classList.toggle("uneasy-mode", active);
-  document.querySelector("#navUserButton").textContent = state.endingPhase === "published" ? "南康白起" : state.endingPhase === "resolved" ? branchStories[state.ending]?.account || "用户中心" : state.decisions.subject === "owner" ? "南康好友" : active ? "访客 444" : "用户中心";
+  document.querySelector("#navUserButton").textContent = state.endingPhase === "published" ? "南康白起" : state.endingPhase === "resolved" ? branchStories[state.ending]?.account || "用户中心" : state.failedQuestion === 1 ? "旧识" : active ? "访客 444" : "用户中心";
   const status = document.querySelector("#homeLoginStatus");
   status.textContent = state.endingPhase === "resolved" ? `当前用户：${branchStories[state.ending]?.account || "未登录"}` : active ? (state.recoveryStep >= 6 ? "您尚未登录。另一个您已在线。" : "您尚未登录。恢复记录中已有您的姓名。") : "您尚未登录";
   const messages = { 0: "未读回执：1　／　发件人：本次申请人", 2: "检索结束：没有找到。上次申请将这一结果填写为“不存在”。", 3: "缓存引用来源：另一个缓存。最初发言人：空。", 4: "本次浏览不会写入历史登录记录。恢复申请除外。", 5: "页面文字未改变。阅读者记录已更新。", 6: state.diaryVisits.includes("那个人") ? "《那个人》正文仍为 0 字。阅读回执已签收。" : "目录完整。持有人一栏仍在等待填写。", 7: "第1900楼显示本次访问时间。上一份申请把它认作了自己的过去。", 8: state.recoveryStep >= 6 ? "核对对象：申请人。原账号资料已不足以继续区分。" : "同号恢复申请正在等待您处理。" };
@@ -219,38 +231,17 @@ function renderAtmosphere(page) {
   const echo = document.querySelector("#homeEcho");
   echo.hidden = !active;
   echo.textContent = state.endingPhase === "resolved" ? "[用户中心] 一份已结束的申请" : "[用户中心] 您有一份早于本次访问的恢复回执";
-  const note = document.querySelector("#recoveryIdentityNote");
-  note.textContent = state.recoveryStep >= 4 ? `资料归属：${state.decisions.subject === "owner" ? "当前申请人" : "待核对"}　／　原持有人：空` : "";
-}
-
-function renderReview() {
-  clearEndingTimers();
-  document.body.classList.remove("published-mode", "identity-slip");
-  document.body.classList.add("ghost-mode");
-  document.querySelector("#branchReceipt").textContent = checkpoints.map(item => `${item.title}：${item.options.find(([value]) => value === state.decisions[item.key])?.[1] || "旧申请未记录"}`).join("\n");
-  document.querySelectorAll("[name=verdict]").forEach(input => { input.checked = input.value === state.verdict; });
-  updateBranchActions();
-  tickerText.textContent = "全部答案匹配。尚未确认：这些答案属于谁。";
-  pageCounter.textContent = "用户中心 / 处理恢复申请";
-}
-
-function updateBranchActions() {
-  const labels = { later: ["保留记录，结束调查", "清除没有持有人的身份"], alive: ["断开会话，不代替他回答", "保留会话，等待本人回复"], empty: ["保留空缺，撤回申请", "删除这个拼成的身份"] };
-  document.querySelector("#branchPreserve").textContent = labels[state.verdict][0];
-  document.querySelector("#branchContact").textContent = labels[state.verdict][1];
-}
-
-function chooseBranch(action) {
-  if (state.endingPhase !== "review" || state.recoveryStep < 7) return;
-  if (action === "restore") {
-    state.endingPhase = "compose"; saveState(); showPage(11); return;
+  document.body.classList.toggle("record-drift", state.failedQuestion > 0);
+  if (state.failedQuestion) {
+    document.querySelector("#homeLoginStatus").textContent = `本次申请：${state.recoveryStep} / 7。系统已经替你写完剩下的部分。`;
+    if ([0,2,3,4,5,6,7,8].includes(page)) tickerText.textContent = failureRoute().notice;
   }
-  if (action === "preserve") resolveEnding(state.verdict === "later" ? "archive" : "refusal");
-  if (action === "contact") resolveEnding(state.verdict === "alive" ? "waiting" : "erased");
+  const note = document.querySelector("#recoveryIdentityNote");
+  note.textContent = state.recoveryStep >= 4 ? `资料归属：${state.failedQuestion ? "当前申请人" : "待核对"}　／　原持有人：空` : "";
 }
 
 function resolveEnding(ending) {
-  if (state.recoveryStep < 7 || !branchStories[ending]) return;
+  if (!hasOutcome() || !branchStories[ending] || ending !== outcomeRoute()) return;
   state.endingPhase = "resolved"; state.ending = ending; state.endingBeat = 0; state.branchAction = "";
   saveState(); showPage(14);
 }
@@ -263,16 +254,20 @@ function renderBranchEnding() {
   const beat = state.endingBeat;
   document.querySelector("#branchEndingTitle").textContent = story.title;
   const steps = story.steps.map(item => [...item]);
-  if (state.ending === "archive" && state.decisions.trace === "replace") steps[1][1] = "你选择覆盖过旧申请。归档包里却仍有一张回执。\n\n文件名：被覆盖的人。\n处理意见：如果连你也不记得我，就没有人知道被删掉的是什么了。";
-  if (state.ending === "erased" && state.decisions.blank === "fill") steps[0][1] += "\n\n补齐姓名时，你选择了‘当前申请人’。删除队列沿用了这个名字。";
-  if (state.ending === "waiting" && state.branchAction === "stay") steps[3] = ["退回的站内信", "你的回复：我还在这里。不要替我退出。\n\n系统退回：同一账号不能向自己发送站内信。\n\n对方的输入状态停了。在线名单仍只有一人。\n你第一次不敢确定，停下来的是哪一个。"];
-  if (state.ending === "erased" && state.branchAction === "claim") steps[3] = ["编号核验结果", "申请 444 已找到。\n申请人：第443位访问者。\n提交内容：请证明我不是前一个人。\n\n页面为你的申诉分配了新编号：445。\n它保存了你的话，只是不肯承认说话的是你。"];
-  if (state.ending === "refusal" && state.branchAction === "send") steps[3] = ["信件已投递", "收件人：第445位访问者。\n状态：已读。\n阅读时间：早于你的本次申请。\n\n发件箱里只剩下一个回信按钮。\n你终于想起，最初那句劝你不要继续的话，就是这样到这里的。"];
-  if (state.ending === "archive" && state.decisions.blank === "fill") steps[2][1] += "\n\n副本里还有你先前补入的姓名。封存时，你可以选择不把它写进原件。";
+  if (state.failedQuestion) {
+    const q = rules.questions[state.failedQuestion - 1];
+    const chosen = q.options.find(([value]) => value === state.answers[state.failedQuestion - 1])?.[1] || "";
+    steps[0][1] = `接收记录：「${chosen}」。\n\n${steps[0][1]}`;
+  }
+  if (state.ending === "waiting" && state.branchAction) steps[3] = ["对方停止输入", `你说：${state.branchAction === "stay" ? "我还在。" : "我等你。"}\n\n对方：这句话我已经等了十八天。\n\n你的消息时间变成了2008年3月9日。\n页面上方显示：最后回复，十八天后。`];
+  if (state.ending === "erased" && state.branchAction) steps[3] = ["来源校验", "申请 444 已找到。来源：另一份转载。\n\n你的陈述被保存了。发言人一栏被删去。\n\n有人在下面问：这段话有原帖吗？\n你无法回复。系统说，没有找到你。"];
+  if (state.ending === "refusal" && state.branchAction === "send") steps[3] = ["信件已投递", "对方已读。\n阅读时间：你进入页面之前。\n\n那句最初劝你不要继续的话，又出现在第一页。\n现在你知道是谁发的了。\n你的账号正在等待下一位访问者。"];
+  if (state.ending === "reversed" && state.branchAction) steps[3] = ["已保留记录", state.branchAction === "login" ? "这次登录已保留。为了修复时间顺序，你的注销日期被移到了明天。\n\n日历只剩下今天和明天。\n退出按钮上写着：尚未到期。" : "退出记录已保留。\n你的本次登录被删除。\n\n页面仍然在响应。它说这是注销之前留下的缓存。\n包括你接下来要说的话。"];
+  if (state.ending === "replacement" && state.branchAction) steps[3] = ["更正已存档", "你的更正被引用为第1901楼。\n\n“这不是当年的记录。”\n\n回复：每次有人问到1900楼，他都会出来说这句话。\n\n原帖已经给你留好了下一层。"];
   const task = branchTasks[state.ending];
   const taskPanel = document.querySelector("#branchTask");
   taskPanel.hidden = beat !== 2;
-  taskPanel.innerHTML = beat === 2 ? `<h2>${task.title}</h2><p>${textToHtml(task.body)}</p>${task.input ? '<form id="identityClaimForm"><label>本次申请编号<input name="claim" inputmode="numeric" maxlength="3" autocomplete="off" required></label><button class="old-button" type="submit">提交申诉</button><p id="claimFeedback" role="status"></p></form>' : `<div class="branch-actions">${task.options.map(([value, label]) => `<button class="old-button" data-finish-branch="${value}" type="button">${label}</button>`).join("")}</div>`}` : "";
+  taskPanel.innerHTML = beat === 2 ? `<h2>${task.title}</h2><p>${textToHtml(task.body)}</p><div class="branch-actions">${task.options.map(([value, label]) => `<button class="old-button" data-finish-branch="${value}" type="button">${label}</button>`).join("")}</div>` : "";
   if (beat === 3) recordEnding(state.ending);
   document.querySelector("#branchEndingContent").innerHTML = steps.slice(0, beat + 1).map(([title, body]) => `<article class="ending-letter"><header>${escapeHtml(title)}</header><p>${textToHtml(body)}</p></article>`).join("");
   document.querySelector("#endingNext").hidden = beat >= 2;
@@ -284,12 +279,6 @@ function renderBranchEnding() {
   pageCounter.textContent = "恢复申请 / 处理回执";
   if (beat > 0) document.querySelector("#branchEndingContent").lastElementChild?.scrollIntoView({ block: "center", behavior: "auto" });
 }
-
-document.addEventListener("change", event => {
-  if (event.target.matches("[name=verdict]") && ["later", "alive", "empty"].includes(event.target.value)) {
-    state.verdict = event.target.value; saveState(); updateBranchActions();
-  }
-});
 
 let state = loadState();
 let diaryReturnFocus = null;
@@ -303,23 +292,27 @@ history.scrollRestoration = "manual";
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey));
-    const recoveryStep = Math.max(0, Math.min(7, Number(saved?.recoveryStep) || 0));
+    if (!saved) {
+      const previous = JSON.parse(localStorage.getItem("yuanan-forum-mystery-v6"));
+      return { ...freshState(), muted: Boolean(previous?.muted) };
+    }
+    const recoveryStep = Math.max(0, Math.min(7, Math.floor(Number(saved?.recoveryStep) || 0)));
     const endingPhase = ["none", "manifesting", "review", "compose", "published", "resolved"].includes(saved?.endingPhase)
       ? saved.endingPhase
       : recoveryStep >= 7 ? "manifesting" : "none";
     return {
       ...freshState(),
+      failedQuestion: Math.max(0, Math.min(7, Math.floor(Number(saved?.failedQuestion) || 0))),
+      answers: Array.isArray(saved?.answers) ? saved.answers.slice(0,7).map(String) : [],
       completed: Object.fromEntries(Object.entries(saved?.completed || {}).filter(([key, value]) => endingNames[key] && value && typeof value.time === "string")),
       branchAction: typeof saved?.branchAction === "string" ? saved.branchAction : "",
       composeTitle: typeof saved?.composeTitle === "string" ? saved.composeTitle.slice(0, 4) : "",
-      composePosition: Math.max(0, Math.min(possessionBodyText.length, Math.floor(Number(saved?.composePosition) || 0))),
+      composePosition: Math.max(0, Math.min(1000, Math.floor(Number(saved?.composePosition) || 0))),
       muted: Boolean(saved?.muted),
       ghostRead: Math.max(0, Math.min(6, Math.floor(Number(saved?.ghostRead) || 0))),
       blackoutSeen: Boolean(saved?.blackoutSeen),
       storyStarted: Boolean(saved?.storyStarted),
-      decisions: Object.fromEntries(Object.entries(saved?.decisions || {}).filter(([key, value]) => ["trace", "subject", "blank"].includes(key) && ["keep", "replace", "visitor", "owner", "leave", "fill"].includes(value))),
-      verdict: ["later", "alive", "empty"].includes(saved?.verdict) ? saved.verdict : "later",
-      ending: ["archive", "waiting", "erased", "refusal"].includes(saved?.ending) ? saved.ending : "",
+      ending: Object.hasOwn(endingNames, saved?.ending) ? saved.ending : "",
       endingBeat: Math.max(0, Math.min(3, Number(saved?.endingBeat) || 0)),
       diaryVisits: Array.isArray(saved?.diaryVisits) ? saved.diaryVisits.filter(x => typeof x === "string").slice(0, 40) : [],
       recoveryStep,
@@ -336,7 +329,7 @@ function loadState() {
 }
 
 function freshState() {
-  return { ghostRead: 0, blackoutSeen: false, completed: {}, branchAction: "", composeTitle: "", composePosition: 0, muted: false, decisions: {}, verdict: "later", ending: "", endingBeat: 0, diaryVisits: [], storyStarted: false, recoveryStep: 0, threadPage: 1, threadMode: "all", ordinaryTitle: "十年前的网吧，现在还有人记得吗", endingPhase: "none", composeReturnAttempts: 0, publishedAt: "" };
+  return { failedQuestion: 0, answers: [], ghostRead: 0, blackoutSeen: false, completed: {}, branchAction: "", composeTitle: "", composePosition: 0, muted: false, ending: "", endingBeat: 0, diaryVisits: [], storyStarted: false, recoveryStep: 0, threadPage: 1, threadMode: "all", ordinaryTitle: "十年前的网吧，现在还有人记得吗", endingPhase: "none", composeReturnAttempts: 0, publishedAt: "" };
 }
 
 function saveState() {
@@ -433,7 +426,7 @@ function openDiary(title, trigger) {
     receipt.className = "access-receipt";
     diaryReaderText.after(receipt);
   }
-  receipt.textContent = state.recoveryStep >= 4 ? `阅读回执：${state.decisions.subject === "owner" ? "原作者" : "第444位访问者"}　／　${content ? "只读" : "正文 0 字，阅读完成"}` : "";
+  receipt.textContent = state.recoveryStep >= 4 ? `阅读回执：${state.failedQuestion === 5 ? "原作者" : "第444位访问者"}　／　${content ? "只读" : "正文 0 字，阅读完成"}` : "";
   diaryReader.hidden = false;
   document.body.classList.add("reader-open");
   document.querySelector("#closeDiaryTop").focus();
@@ -483,7 +476,7 @@ function buildMainReply(floor) {
       sourced: true
     };
   }
-  if (floor === 401 && state.recoveryStep >= 4) return { floor, user: "最后一页", time: "2015-05-29 03:11", html: `我刚刚读到一句：<br>“${state.decisions.subject === "owner" ? "这是我的账号，合并记录" : "我是代查的访客，分开保存"}。”<br><br>为什么它还在等人点选？这句话不是早就写在这里了吗？` };
+  if (floor === 401 && state.recoveryStep >= 4) return { floor, user: "最后一页", time: "2015-05-29 03:11", html: `我刚刚读到一句：<br>“${escapeHtml(rules.questions[0].options.find(([value]) => value === state.answers[0])?.[1] || "还没有人回答")}。”<br><br>为什么它还在等人点选？这句话不是早就写在这里了吗？` };
   if (threadStoryReplies[floor]) return { floor, ...threadStoryReplies[floor] };
   return {
     floor,
@@ -537,35 +530,23 @@ function renderOrdinaryThread() {
     text: data.replySeed[index % data.replySeed.length],
     floor: index + 1
   }));
-  if (state.recoveryStep >= 4 && state.ordinaryTitle === "有没有遇到过已经注销却还在上线的账号") samples.push({ user: "第443位访问者", floor: 17, text: state.decisions.subject === "owner" ? "有人选了‘这是我的账号’。现在轮到我当访客了。" : "我也选过‘我是代查的访客’。这句话后来出现在了我的密保里。" });
+  if (state.recoveryStep >= 4 && state.ordinaryTitle === "有没有遇到过已经注销却还在上线的账号") samples.push({ user: "第443位访问者", floor: 17, text: "我也答过这些问题。正确答案属于旧帖，错误答案被登记成了我的经历。" });
   document.querySelector("#ordinaryReplies").innerHTML = samples.map(reply => `<div class="floor"><span><b>${reply.floor}#</b>　${escapeHtml(reply.user)}</span><p>${escapeHtml(reply.text)}</p></div>`).join("");
-}
-
-function ghostFloorHtml(post) {
-  const postTime = post.current ? stamp() : post.time;
-  if (post.floor === 440) post = { ...post, html: state.decisions.trace === "replace" ? "你把上一份申请覆盖了。<br>现在没有记录能证明，在你之前还有一个人。<br><br>那个人刚才也这样做了。" : "你保留了两份申请。<br>一份填着你的答案。<br>另一份也填着你的答案。<br><br>可你只填过一次。" };
-  if (post.floor === 442 && state.decisions.blank === "leave") post = { ...post, html: "你把姓名留空了。<br>他们给我留下的也是一个空格。<br><br>可页面不能永远空着。<br>它总要显示一个正在阅读的人。" };
-  return `<article class="archive-floor manifest-floor" data-ghost-floor="${post.floor}">
-    <header class="archive-floor-head">
-      <span>作者：<b>${escapeHtml(post.user)}</b></span><span>时间：${escapeHtml(postTime)}</span>
-      <span class="archive-floor-actions">回复　举报　${post.floor}楼</span>
-    </header>
-    <div class="archive-floor-body">${post.html}</div>
-  </article>`;
 }
 
 function startGhostSequence() {
   clearEndingTimers();
+  const route = failureRoute();
+  if (!route) { enterOutcome(); return; }
   document.body.classList.add("ghost-mode");
-  const count = state.ghostRead;
-  ghostReplies.innerHTML = ghostPosts.slice(0, count).map(ghostFloorHtml).join("");
+  const count = Math.min(3, state.ghostRead);
+  const selected = rules.questions[state.failedQuestion - 1].options.find(([value]) => value === state.answers[state.failedQuestion - 1])?.[1] || "";
+  ghostReplies.innerHTML = route.ghosts.slice(0,count).map((text,index) => `<article class="archive-floor manifest-floor"><header class="archive-floor-head"><span>作者：${index === 2 ? "本次申请人" : "未署名"}</span><span>时间：${index === 0 ? "早于本次访问" : "刚刚"}</span><span>${438 + index}楼</span></header><div class="archive-floor-body">${index === 0 ? `<p class="received-answer">申请中写着：${escapeHtml(selected)}</p>` : ""}${textToHtml(text)}</div></article>`).join("");
   ghostThreadStats.textContent = `点击：32330　回复：${437 + count}　共 ${count ? 4 : 3} 页`;
-  ghostSystemText.textContent = count === 6 ? "恢复进度：99%　两份身份记录发生冲突。" : `恢复队列：${count} / 6　等待读取`;
-  document.querySelector("#readGhostReply").hidden = count >= 6;
-  ghostContinue.hidden = count < 6;
-  document.querySelector("#navUserButton").textContent = count >= 4 ? "南康白起" : count >= 2 ? "南康好友" : "用户中心";
-  document.body.classList.toggle("identity-slip", count >= 4);
-  if (count > 0) ghostReplies.lastElementChild?.scrollIntoView({ block: "center", behavior: "auto" });
+  ghostSystemText.textContent = count === 3 ? "剩余资料已由原账号补齐。" : `恢复队列：${count} / 3　等待读取`;
+  document.querySelector("#readGhostReply").hidden = count >= 3;
+  ghostContinue.hidden = count < 3;
+  if (count > 0) ghostReplies.lastElementChild?.scrollIntoView({ block:"center", behavior:"auto" });
 }
 
 function composeWarningText() {
@@ -576,15 +557,15 @@ function composeWarningText() {
 }
 
 function updatePublishAvailability() {
-  publishPossessionButton.disabled = possessionTitleInput.value.trim() !== "一路走好" || possessionBody.value !== possessionBodyText;
+  publishPossessionButton.disabled = !possessionTitleInput.value || possessionBody.value !== currentPossessionBody();
 }
 
 function renderCompose() {
   clearEndingTimers();
   document.body.classList.add("ghost-mode");
   possessionTitleInput.value = state.composeTitle;
-  possessionBody.value = possessionBodyText.slice(0, state.composePosition);
-  composeWarning.textContent = state.branchAction === "sign" ? "归档副本已经签收了你的名字。现在还差一份告别。" : state.branchAction === "yield" ? "对方接受了你的退出请求。请留下最后一篇帖子。" : composeWarningText();
+  possessionBody.value = currentPossessionBody().slice(0, state.composePosition);
+  composeWarning.textContent = composeWarningText() || failureRoute()?.notice || "";
   composeAuthor.textContent = possessionTitleInput.value ? "南康白起" : "南康好友";
   composeStatus.textContent = possessionTitleInput.value ? "在线" : "身份核对中";
   if (!possessionTitleInput.value) possessionBody.value = "";
@@ -594,15 +575,15 @@ function renderCompose() {
 }
 
 function startBodyTyping() {
-  if (bodyTypingTimer || possessionBody.value === possessionBodyText) return;
+  if (bodyTypingTimer || possessionBody.value === currentPossessionBody()) return;
   let position = possessionBody.value.length;
   bodyTypingTimer = window.setInterval(() => {
     position += 1;
-    possessionBody.value = possessionBodyText.slice(0, position);
+    possessionBody.value = currentPossessionBody().slice(0, position);
     state.composePosition = position;
-    if (position % 20 === 0 || position >= possessionBodyText.length) saveState();
+    if (position % 20 === 0 || position >= currentPossessionBody().length) saveState();
     possessionBody.scrollTop = possessionBody.scrollHeight;
-    if (position >= possessionBodyText.length) {
+    if (position >= currentPossessionBody().length) {
       window.clearInterval(bodyTypingTimer);
       bodyTypingTimer = null;
       updatePublishAvailability();
@@ -625,7 +606,10 @@ function renderPublishedEnding() {
     const date = new Date(Date.now() + (index + 1) * 1000);
     element.textContent = stamp(date);
   });
-  document.querySelector("#publishedBody").innerHTML = textToHtml(possessionBodyText);
+  document.querySelector("#title-12").textContent = `[左岸文字] 第444位访问者，${state.composeTitle}`;
+  document.querySelector("#blackoutEnding h1").textContent = failureRoute()?.dark || "你不该来这里。";
+  document.querySelector("#blackoutEnding .blackout-message p").textContent = `结局 · ${endingNames[outcomeRoute()]}`;
+  document.querySelector("#publishedBody").innerHTML = textToHtml(currentPossessionBody());
   document.querySelectorAll(".possession-reply").forEach(element => element.classList.remove("revealed"));
   blackoutEnding.classList.remove("active", "message-visible");
   setBlackoutOpen(false);
@@ -644,13 +628,12 @@ function renderPublishedEnding() {
 
 function revealBlackout() {
   clearEndingTimers();
-  state.blackoutSeen = true; saveState();
+  state.blackoutSeen = true; recordEnding(outcomeRoute()); saveState();
   setBlackoutOpen(true);
   requestAnimationFrame(() => blackoutEnding.classList.add("active"));
   playBlackoutSound();
   later(() => {
     blackoutEnding.classList.add("message-visible");
-    recordEnding("possession");
     blackoutEnding.querySelector("button")?.focus({ preventScroll: true });
   }, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 50 : 850);
 }
@@ -663,9 +646,9 @@ function pageFromHash() {
 function showPage(requestedPage, addHistory = true) {
   setBlackoutOpen(false);
   let next = Math.max(0, Math.min(15, Number(requestedPage) || 0));
-  const phasePage = { manifesting: 9, review: 13, compose: 11, published: 12, resolved: 14 };
-  if ([8, 9, 11, 12, 13, 14].includes(next) && state.recoveryStep >= 7) next = phasePage[state.endingPhase] || 9;
-  if ([9, 11, 12, 13, 14].includes(next) && state.recoveryStep < 7) next = 8;
+  const phasePage = { manifesting: 9, review: 9, compose: 11, published: 12, resolved: 14 };
+  if ([8, 9, 11, 12, 13, 14].includes(next) && hasOutcome()) next = phasePage[state.endingPhase] || 9;
+  if ([9, 11, 12, 13, 14].includes(next) && !hasOutcome()) next = 8;
   if (next === 1) renderMainThread();
   if (next === 10) renderOrdinaryThread();
 
@@ -711,7 +694,7 @@ function showPage(requestedPage, addHistory = true) {
   if (next === 9) startGhostSequence();
   else if (next === 11) renderCompose();
   else if (next === 12) renderPublishedEnding();
-  else if (next === 13) renderReview();
+  else if (next === 13) enterOutcome();
   else if (next === 14) renderBranchEnding();
   else if (next === 15) renderCollection();
   else if (next !== 9) {
@@ -735,72 +718,52 @@ function openForumThread(title) {
 }
 
 function renderRecovery() {
-  recoveryStepNumber.textContent = String(Math.min(7, state.recoveryStep + 1));
-  recoveryProgressBar.style.width = `${(state.recoveryStep / 7) * 100}%`;
-  pageCounter.textContent = `账号恢复：已核对 ${state.recoveryStep} / 7`;
-  const checkpoint = checkpoints.find(item => item.step === state.recoveryStep && !state.decisions[item.key]);
-  const checkpointPanel = document.querySelector("#recoveryReceipt");
-  checkpointPanel.hidden = !checkpoint;
-  if (checkpoint) {
-    recoveryForms.forEach(form => form.classList.remove("active"));
-    checkpointPanel.innerHTML = `<div class="question-no">恢复记录 / 待处理</div><h2>${checkpoint.title}</h2><div class="receipt-text">${checkpoint.text}</div><div class="receipt-choices">${checkpoint.options.map(([value, label]) => `<button class="old-button" type="button" data-decision="${checkpoint.key}" data-value="${value}">${label}</button>`).join("")}</div>`;
-    checkpointPanel.querySelector("button").focus({ preventScroll: true });
-    return;
-  }
-  const step = Math.min(state.recoveryStep, 6);
-  recoveryForms.forEach((form, index) => form.classList.toggle("active", index === step));
-  recoveryStepNumber.textContent = String(state.recoveryStep + 1);
-  recoveryProgressBar.style.width = `${(state.recoveryStep / 7) * 100}%`;
-  pageCounter.textContent = `账号恢复：密保 ${state.recoveryStep + 1} / 7`;
-  const activeInput = recoveryForms[step]?.querySelector("input");
-  window.setTimeout(() => activeInput?.focus({ preventScroll: true }), 0);
-}
-
-function answerValue(form) {
-  const checked = form.querySelector("input[type=radio]:checked");
-  if (checked) return checked.value;
-  const textInput = form.querySelector("input:not([type=radio])");
-  if (!textInput) return "";
-  let value = textInput.value.trim().replace(/[《》\s]/g, "");
-  if (["days", "dates", "floor"].includes(form.dataset.key)) value = value.replace(/\D/g, "");
-  return value;
+  const step = Math.min(state.recoveryStep,6);
+  recoveryForms.forEach((form,index) => {
+    form.classList.toggle("active",index === step);
+    form.querySelector("button").disabled = false;
+    form.querySelector(".recovery-feedback").textContent = "";
+  });
+  recoveryStepNumber.textContent = String(step + 1);
+  recoveryProgressBar.style.width = `${step / 7 * 100}%`;
+  pageCounter.textContent = `账号恢复：密保 ${step + 1} / 7`;
+  const receipts = ["", "已保存你的第一项陈述。修改记录：无。", "申请编号444。旧申请也停在这道题之前。", "发言人的来源尚未找到。系统正在等待你给他一个位置。", "这组日期属于另一个账号。当前登录者：你。", "正文仍是空白。页面却把这次阅读记成了重读。", "只剩最后一项。你之前的答案已经出现在另一份申请里。"];
+  const panel = document.querySelector("#recoveryReceipt");
+  panel.hidden = step === 0;
+  panel.textContent = receipts[step];
+  recoveryForms[step].querySelector("input")?.focus({preventScroll:true});
 }
 
 function submitRecovery(form) {
   const index = recoveryForms.indexOf(form);
-  if (index !== state.recoveryStep) return;
+  if (index !== state.recoveryStep || hasOutcome()) return;
+  const value = form.querySelector("input:checked")?.value;
+  const result = rules.evaluateAnswer(index,value);
   const feedback = form.querySelector(".recovery-feedback");
-  const value = answerValue(form);
-  if (!value) {
-    feedback.className = "recovery-feedback";
-    feedback.textContent = "请输入或选择一个答案。";
-    return;
-  }
-  if (value !== form.dataset.answer) {
-    feedback.className = "recovery-feedback error";
-    feedback.textContent = "密保答案不匹配，请返回原帖查找相关链接后重试。";
-    form.classList.add("shake");
-    window.setTimeout(() => form.classList.remove("shake"), 320);
-    return;
-  }
-  feedback.className = "recovery-feedback ok";
-  feedback.textContent = ["关系记录已接收。", "空缺十八天已写入。", "没有找到原始发言人，继续使用当前申请。", "时间记录已接收。", "标题已接收。正文仍为零字。", "1894 楼已保留。正在比对本次申请。", "资料匹配。正在恢复申请人。"][index];
-  if (index === recoveryForms.length - 1) {
-    prepareEndingAudio();
+  if (!result.valid) { feedback.textContent = "请选择一项答案。"; return; }
+  form.querySelector("button").disabled = true;
+  state.answers[index] = value;
+  state.recoveryStep = index + 1;
+  feedback.textContent = "记录已接收。";
+  if (!result.correct) {
+    state.failedQuestion = index + 1;
     state.endingPhase = "manifesting";
+    state.ghostRead = 0;
+    prepareEndingAudio();
+  } else if (state.recoveryStep === 7) {
+    state.endingPhase = "resolved"; state.ending = "archive";
   }
-  state.recoveryStep += 1;
   saveState();
   later(() => {
     if (!document.querySelector("#page-8").classList.contains("active")) return;
-    if (state.recoveryStep >= 7) showPage(9);
+    if (hasOutcome()) showPage(state.failedQuestion ? 9 : 14);
     else { renderRecovery(); renderAtmosphere(8); }
-  }, 520);
+  },650);
 }
 
 document.addEventListener("click", event => {
   if (event.target.closest("#readGhostReply") && state.endingPhase === "manifesting") {
-    state.ghostRead = Math.min(6, state.ghostRead + 1); saveState(); startGhostSequence(); return;
+    state.ghostRead = Math.min(3, state.ghostRead + 1); saveState(); startGhostSequence(); return;
   }
   if (event.target.closest("#publishedContinue") && state.endingPhase === "published") { prepareEndingAudio(); revealBlackout(); return; }
 
@@ -809,34 +772,12 @@ document.addEventListener("click", event => {
   const finish = event.target.closest("[data-finish-branch]");
   if (finish) { finishBranch(finish.dataset.finishBranch); return; }
 
-  const decision = event.target.closest("[data-decision]");
-  if (decision) {
-    const checkpoint = checkpoints.find(item => item.key === decision.dataset.decision && item.step === state.recoveryStep);
-    if (!checkpoint || state.decisions[checkpoint.key] || !checkpoint.options.some(([value]) => value === decision.dataset.value)) return;
-    state.decisions[checkpoint.key] = decision.dataset.value;
-    saveState(); renderRecovery(); renderAtmosphere(8); return;
-  }
-  const branchAction = event.target.closest("[data-branch-action]");
-  if (branchAction) { chooseBranch(branchAction.dataset.branchAction); return; }
   if (event.target.closest("[data-ending-next]")) {
     if (state.endingPhase !== "resolved" || state.endingBeat >= 2) return;
     state.endingBeat = Math.min(2, state.endingBeat + 1); saveState(); renderBranchEnding(); return;
   }
-  if (event.target.closest("[data-replay-branch]")) {
-    state.endingPhase = "review"; state.ending = ""; state.endingBeat = 0;
-    possessionTitleInput.value = ""; possessionBody.value = "";
-    state.composeTitle = ""; state.composePosition = 0; state.branchAction = ""; state.blackoutSeen = false;
-    saveState(); showPage(13); return;
-  }
-  if (event.target.closest("[data-withdraw]")) { resolveEnding("refusal"); return; }
-
-  if (event.target === continueRecoveryButton) {
-    state.endingPhase = "review";
-    state.verdict = state.decisions.subject === "owner" ? "alive" : state.decisions.blank === "fill" ? "empty" : "later";
-    saveState();
-    showPage(13);
-    return;
-  }
+  if (event.target.closest("[data-replay-branch]")) { retryQuestion(); return; }
+  if (event.target === continueRecoveryButton) { enterOutcome(); return; }
   if (event.target === soundToggle || event.target.closest("[data-mute]")) {
     endingMuted = !endingMuted;
     state.muted = endingMuted; saveState();
@@ -901,18 +842,9 @@ document.addEventListener("click", event => {
 });
 
 document.addEventListener("submit", event => {
-  if (event.target.id === "identityClaimForm") {
-    event.preventDefault();
-    if (event.target.elements.claim.value.trim() !== "444") {
-      document.querySelector("#claimFeedback").textContent = "与本页回执编号不符。请查看页面上方的申请记录。";
-      return;
-    }
-    finishBranch("claim"); return;
-  }
-
   if (event.target === possessionPostForm) {
     event.preventDefault();
-    if (possessionTitleInput.value.trim() !== "一路走好" || possessionBody.value !== possessionBodyText) return;
+    if (!possessionTitleInput.value || possessionBody.value !== currentPossessionBody()) return;
     prepareEndingAudio();
     state.endingPhase = "published";
     state.publishedAt = stamp();
@@ -935,7 +867,7 @@ document.addEventListener("submit", event => {
   submitRecovery(form);
 });
 
-possessionTitleInput.addEventListener("input", () => {
+possessionTitleInput.addEventListener("change", () => {
   state.composeTitle = possessionTitleInput.value; saveState();
   const hasInput = Boolean(possessionTitleInput.value);
   composeAuthor.textContent = hasInput ? "南康白起" : "南康好友";
@@ -978,6 +910,7 @@ function restartRun() {
   document.body.classList.remove("ghost-mode", "identity-slip", "published-mode");
   recoveryForms.forEach(form => {
     form.reset();
+    form.querySelector("button").disabled = false;
     form.querySelector(".recovery-feedback").textContent = "";
   });
   showPage(0);
